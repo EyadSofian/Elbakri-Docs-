@@ -1,0 +1,175 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-navy: var(--navy);
+  --color-navy-foreground: var(--navy-foreground);
+  --color-navy-soft: var(--navy-soft);
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-cyan: var(--cyan);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(0.99 0.003 250);
+  --foreground: oklch(0.18 0.04 260);
+
+  --navy: oklch(0.26 0.09 260);
+  --navy-foreground: oklch(0.98 0.003 250);
+  --navy-soft: oklch(0.94 0.02 260);
+
+  --gold: oklch(0.78 0.13 80);
+  --gold-foreground: oklch(0.22 0.05 260);
+
+  --cyan: oklch(0.72 0.13 220);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.04 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.04 260);
+
+  --primary: oklch(0.26 0.09 260);
+  --primary-foreground: oklch(0.98 0.003 250);
+
+  --secondary: oklch(0.96 0.01 250);
+  --secondary-foreground: oklch(0.26 0.09 260);
+
+  --muted: oklch(0.96 0.01 250);
+  --muted-foreground: oklch(0.5 0.03 260);
+
+  --accent: oklch(0.94 0.02 220);
+  --accent-foreground: oklch(0.26 0.09 260);
+
+  --destructive: oklch(0.6 0.22 27);
+  --destructive-foreground: oklch(0.99 0.003 250);
+
+  --border: oklch(0.92 0.012 255);
+  --input: oklch(0.92 0.012 255);
+  --ring: oklch(0.55 0.06 260);
+
+  --sidebar: oklch(0.22 0.07 260);
+  --sidebar-foreground: oklch(0.95 0.01 250);
+  --sidebar-primary: oklch(0.78 0.13 80);
+  --sidebar-primary-foreground: oklch(0.22 0.05 260);
+  --sidebar-accent: oklch(0.3 0.08 260);
+  --sidebar-accent-foreground: oklch(0.98 0.003 250);
+  --sidebar-border: oklch(0.3 0.06 260);
+  --sidebar-ring: oklch(0.78 0.13 80);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html, body { font-family: var(--font-body); }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,h2,h3,h4 { font-family: var(--font-display); letter-spacing: -0.01em; }
+}
+
+/* ===== PDF / Document styles ===== */
+.doc-sheet {
+  background: white;
+  color: #111;
+  width: 210mm;
+  min-height: 297mm;
+  padding: 14mm 14mm 18mm;
+  margin: 0 auto;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 11px;
+  line-height: 1.45;
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.08);
+  position: relative;
+}
+.doc-sheet--landscape {
+  width: 297mm;
+  min-height: 210mm;
+}
+.doc-sheet table { width: 100%; border-collapse: collapse; }
+.doc-sheet th, .doc-sheet td { padding: 6px 8px; vertical-align: top; }
+.doc-navy { color: #14224a; }
+.doc-navy-bg { background: #14224a; color: white; }
+.doc-gold-bg { background: #c9a24a; color: #14224a; }
+.doc-divider { height: 3px; background: linear-gradient(90deg,#14224a 0%, #c9a24a 100%); border: 0; }
+.doc-sheet h1 { font-family: "Plus Jakarta Sans", sans-serif; }
+.doc-sheet[dir="rtl"] {
+  font-family: "Cairo", "Inter", system-ui, sans-serif;
+  text-align: right;
+}
+.doc-sheet[dir="rtl"] table { text-align: right; }
+.doc-sheet[dir="rtl"] .text-right { text-align: left; }
+.doc-sheet[dir="rtl"] .text-left { text-align: right; }
+.doc-sheet[dir="rtl"] .ml-auto { margin-left: 0; margin-right: auto; }
+
+/* Status badges (used in bulk export & preview overlays) */
+.status-badge {
+  display: inline-block; padding: 4px 10px; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; border-radius: 3px; border: 1px solid transparent;
+}
+.status-paid      { background: #e6f6ec; color: #146c2e; border-color: #146c2e; }
+.status-unpaid    { background: #fff1e6; color: #b8540a; border-color: #b8540a; }
+.status-partial   { background: #e6efff; color: #1b4ea0; border-color: #1b4ea0; }
+.status-overdue   { background: #fde6e6; color: #8a1414; border-color: #8a1414; }
+.status-cancelled { background: #ececec; color: #555;    border-color: #888; }
+.status-draft     { background: #f4f4f4; color: #444;    border-color: #aaa; }
+
+/* Cancelled diagonal watermark on a doc-sheet */
+.doc-sheet.cancelled-watermark::after {
+  content: "CANCELLED";
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(-28deg);
+  font-size: 140px; font-weight: 900; letter-spacing: 0.12em;
+  color: rgba(180, 30, 30, 0.12);
+  pointer-events: none; white-space: nowrap; z-index: 10;
+}
+
+/* Off-screen render host for bulk export */
+.bulk-export-stage {
+  position: fixed; left: -10000px; top: 0; width: 220mm;
+  background: white; z-index: -1; pointer-events: none;
+}
+
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none !important; }
+  .doc-sheet { box-shadow: none !important; margin: 0; }
+}
