@@ -17,7 +17,13 @@ export interface ConsolidatedFilters {
 }
 
 export function ConsolidatedClientInvoicePreview({
-  client, account, filters, number, lang = "en", preparedBy = "", accountNumber = "",
+  client,
+  account,
+  filters,
+  number,
+  lang = "en",
+  preparedBy = "",
+  accountNumber = "",
   dueDate = "",
 }: {
   client: Client;
@@ -41,7 +47,8 @@ export function ConsolidatedClientInvoicePreview({
     return true;
   };
   const matchesStatus = (r: InvoiceWithPayments) => {
-    if (filters.selectedIds && filters.selectedIds.length > 0) return filters.selectedIds.includes(r.invoice.id);
+    if (filters.selectedIds && filters.selectedIds.length > 0)
+      return filters.selectedIds.includes(r.invoice.id);
     if (r.invoice.status === "Cancelled") return filters.includeCancelled;
     if (r.effectiveStatus === "Paid") return filters.includePaid;
     return true; // unpaid / partial / overdue
@@ -49,7 +56,10 @@ export function ConsolidatedClientInvoicePreview({
 
   const rows = account.invoices.filter(inRange).filter(matchesStatus);
 
-  const totalInvoiced = rows.reduce((s, r) => r.invoice.status === "Cancelled" ? s : s + r.grandTotal, 0);
+  const totalInvoiced = rows.reduce(
+    (s, r) => (r.invoice.status === "Cancelled" ? s : s + r.grandTotal),
+    0,
+  );
   const totalPaid = rows.reduce((s, r) => s + r.paidAmount, 0);
   const totalCredit = rows.reduce((s, r) => s + r.creditApplied, 0);
   const totalCancelled = rows.reduce((s, r) => s + r.cancelledAmount, 0);
@@ -60,26 +70,39 @@ export function ConsolidatedClientInvoicePreview({
   const today = new Date().toISOString().slice(0, 10);
   const statusLabel = (s: string) => {
     if (lang === "ar") {
-      return s === "Paid" ? "مدفوعة" : s === "Partial" ? "مدفوعة جزئياً"
-        : s === "Overdue" ? "متأخرة" : s === "Cancelled" ? "ملغاة"
-        : s === "Unpaid" ? "غير مدفوعة" : s;
+      return s === "Paid"
+        ? "مدفوعة"
+        : s === "Partial"
+          ? "مدفوعة جزئياً"
+          : s === "Overdue"
+            ? "متأخرة"
+            : s === "Cancelled"
+              ? "ملغاة"
+              : s === "Unpaid"
+                ? "غير مدفوعة"
+                : s;
     }
     return s === "Partial" ? "Partially Paid" : s;
   };
 
-  const paymentsIncluded = filters.includePaymentHistory ? account.payments.filter(p => {
-    if (filters.periodFrom && p.date < filters.periodFrom) return false;
-    if (filters.periodTo && p.date > filters.periodTo) return false;
-    return true;
-  }) : [];
+  const paymentsIncluded = filters.includePaymentHistory
+    ? account.payments.filter((p) => {
+        if (filters.periodFrom && p.date < filters.periodFrom) return false;
+        if (filters.periodTo && p.date > filters.periodTo) return false;
+        return true;
+      })
+    : [];
 
-  const creditNotesIncluded = filters.includeCreditNotes ? account.creditNotes.filter(c => {
-    if (filters.periodFrom && c.date < filters.periodFrom) return false;
-    if (filters.periodTo && c.date > filters.periodTo) return false;
-    return true;
-  }) : [];
+  const creditNotesIncluded = filters.includeCreditNotes
+    ? account.creditNotes.filter((c) => {
+        if (filters.periodFrom && c.date < filters.periodFrom) return false;
+        if (filters.periodTo && c.date > filters.periodTo) return false;
+        return true;
+      })
+    : [];
 
-  const invNumberById = (id?: string) => id ? (account.invoices.find(r => r.invoice.id === id)?.invoice.number || "—") : "—";
+  const invNumberById = (id?: string) =>
+    id ? account.invoices.find((r) => r.invoice.id === id)?.invoice.number || "—" : "—";
 
   return (
     <div className="doc-sheet" dir={dir}>
@@ -88,15 +111,21 @@ export function ConsolidatedClientInvoicePreview({
         subtitle={lang === "ar" ? t.paymentSummary : "WITH PAYMENT SUMMARY"}
         number={number}
         date={formatDate(today)}
-        status={finalDue > 0 ? (lang === "ar" ? "مستحق" : "DUE") : (lang === "ar" ? "مسدد" : "SETTLED")}
+        status={
+          finalDue > 0 ? (lang === "ar" ? "مستحق" : "DUE") : lang === "ar" ? "مسدد" : "SETTLED"
+        }
         lang={lang}
       />
 
       <section className="grid grid-cols-2 gap-6 mb-4">
         <div>
-          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">{t.billTo}</div>
+          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">
+            {t.billTo}
+          </div>
           <div className="doc-navy font-semibold text-[13px]">{client.name || "—"}</div>
-          {client.address && <div className="text-[10px] text-neutral-600 whitespace-pre-line">{client.address}</div>}
+          {client.address && (
+            <div className="text-[10px] text-neutral-600 whitespace-pre-line">{client.address}</div>
+          )}
           <div className="text-[10px] text-neutral-600 mt-1 space-y-0.5">
             {client.email && <div>{client.email}</div>}
             {client.phone && <div>{client.phone}</div>}
@@ -104,9 +133,12 @@ export function ConsolidatedClientInvoicePreview({
           </div>
         </div>
         <div className="text-right text-[10.5px]">
-          <KV k={t.accountNumber} v={accountNumber || client.id.slice(0,8).toUpperCase()} />
+          <KV k={t.accountNumber} v={accountNumber || client.id.slice(0, 8).toUpperCase()} />
           <KV k={t.currency} v={cur} />
-          <KV k={t.statementPeriod} v={`${filters.periodFrom ? formatDate(filters.periodFrom) : "—"} → ${filters.periodTo ? formatDate(filters.periodTo) : "—"}`} />
+          <KV
+            k={t.statementPeriod}
+            v={`${filters.periodFrom ? formatDate(filters.periodFrom) : "—"} → ${filters.periodTo ? formatDate(filters.periodTo) : "—"}`}
+          />
           {preparedBy && <KV k={t.preparedBy} v={preparedBy} />}
         </div>
       </section>
@@ -121,14 +153,18 @@ export function ConsolidatedClientInvoicePreview({
           <SBox k={t.totalPaidAmount} v={formatMoney(totalPaid, cur)} />
           <SBox k={t.totalCreditNotes} v={formatMoney(totalCredit, cur)} />
           <SBox k={t.totalCancelledAmount} v={formatMoney(totalCancelled, cur)} />
-          {filters.includePreviousBalance && <SBox k={t.previousBalance} v={formatMoney(previous, cur)} />}
+          {filters.includePreviousBalance && (
+            <SBox k={t.previousBalance} v={formatMoney(previous, cur)} />
+          )}
           <SBox k={t.currentRemainingBalance} v={formatMoney(totalRemaining, cur)} />
           <SBox k={t.finalAmountDue} v={formatMoney(finalDue, cur)} highlight />
         </div>
       </section>
 
       {/* Invoice breakdown */}
-      <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">{t.invoiceBreakdown}</div>
+      <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">
+        {t.invoiceBreakdown}
+      </div>
       <table className="text-[10px] border border-neutral-200 w-full mb-4">
         <thead>
           <tr className="doc-navy-bg text-left">
@@ -146,24 +182,41 @@ export function ConsolidatedClientInvoicePreview({
           </tr>
         </thead>
         <tbody>
-          {rows.length === 0 && <tr><td colSpan={11} className="text-center text-neutral-400 py-6">—</td></tr>}
+          {rows.length === 0 && (
+            <tr>
+              <td colSpan={11} className="text-center text-neutral-400 py-6">
+                —
+              </td>
+            </tr>
+          )}
           {rows.map((r, i) => (
             <tr key={r.invoice.id} className="border-t border-neutral-200 align-top">
               <td className="text-neutral-500">{i + 1}</td>
               <td className="font-semibold doc-navy">{r.invoice.number}</td>
               <td>{formatDate(r.invoice.date)}</td>
               <td>{r.invoice.bookingRef || "—"}</td>
-              <td>{r.invoice.items.map(it => it.description || it.type).filter(Boolean).slice(0,3).join(", ") || "—"}</td>
+              <td>
+                {r.invoice.items
+                  .map((it) => it.description || it.type)
+                  .filter(Boolean)
+                  .slice(0, 3)
+                  .join(", ") || "—"}
+              </td>
               <td className="text-right">{formatMoney(r.grandTotal, cur)}</td>
               <td className="text-right">{formatMoney(r.paidAmount, cur)}</td>
               <td className="text-right">{formatMoney(r.creditApplied, cur)}</td>
               <td className="text-right">{formatMoney(r.cancelledAmount, cur)}</td>
               <td className="text-right font-semibold doc-navy">{formatMoney(r.remaining, cur)}</td>
-              <td className="text-[9.5px] uppercase">{statusLabel(r.effectiveStatus)}{r.daysOverdue > 0 ? ` · ${r.daysOverdue}d` : ""}</td>
+              <td className="text-[9.5px] uppercase">
+                {statusLabel(r.effectiveStatus)}
+                {r.daysOverdue > 0 ? ` · ${r.daysOverdue}d` : ""}
+              </td>
             </tr>
           ))}
           <tr className="doc-gold-bg">
-            <td colSpan={5} className="font-bold uppercase text-[10px] tracking-wider">{t.grandTotal}</td>
+            <td colSpan={5} className="font-bold uppercase text-[10px] tracking-wider">
+              {t.grandTotal}
+            </td>
             <td className="text-right font-bold">{formatMoney(totalInvoiced, cur)}</td>
             <td className="text-right font-bold">{formatMoney(totalPaid, cur)}</td>
             <td className="text-right font-bold">{formatMoney(totalCredit, cur)}</td>
@@ -176,7 +229,9 @@ export function ConsolidatedClientInvoicePreview({
 
       {paymentsIncluded.length > 0 && (
         <>
-          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">{t.paymentHistory}</div>
+          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">
+            {t.paymentHistory}
+          </div>
           <table className="text-[10px] border border-neutral-200 w-full mb-4">
             <thead>
               <tr className="doc-navy-bg text-left">
@@ -190,13 +245,17 @@ export function ConsolidatedClientInvoicePreview({
               </tr>
             </thead>
             <tbody>
-              {paymentsIncluded.map(p => (
+              {paymentsIncluded.map((p) => (
                 <tr key={p.id} className="border-t border-neutral-200 align-top">
                   <td>{formatDate(p.date)}</td>
                   <td className="font-medium">{p.number}</td>
-                  <td className="capitalize">{p.method.replace("_"," ")}</td>
+                  <td className="capitalize">{p.method.replace("_", " ")}</td>
                   <td>{p.reference || "—"}</td>
-                  <td>{p.allocations.length === 0 ? "—" : p.allocations.map(a => invNumberById(a.invoiceId)).join(", ")}</td>
+                  <td>
+                    {p.allocations.length === 0
+                      ? "—"
+                      : p.allocations.map((a) => invNumberById(a.invoiceId)).join(", ")}
+                  </td>
                   <td className="text-right font-semibold">{formatMoney(p.amount, cur)}</td>
                   <td>{p.notes || ""}</td>
                 </tr>
@@ -208,7 +267,9 @@ export function ConsolidatedClientInvoicePreview({
 
       {creditNotesIncluded.length > 0 && (
         <>
-          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">{t.creditNotesDeductions}</div>
+          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">
+            {t.creditNotesDeductions}
+          </div>
           <table className="text-[10px] border border-neutral-200 w-full mb-4">
             <thead>
               <tr className="doc-navy-bg text-left">
@@ -220,12 +281,12 @@ export function ConsolidatedClientInvoicePreview({
               </tr>
             </thead>
             <tbody>
-              {creditNotesIncluded.map(c => (
+              {creditNotesIncluded.map((c) => (
                 <tr key={c.id} className="border-t border-neutral-200">
                   <td>{formatDate(c.date)}</td>
                   <td className="font-medium">{c.number}</td>
                   <td>{invNumberById(c.invoiceId)}</td>
-                  <td className="capitalize">{String(c.reason || "").replace(/_/g," ")}</td>
+                  <td className="capitalize">{String(c.reason || "").replace(/_/g, " ")}</td>
                   <td className="text-right font-semibold">{formatMoney(c.amount, cur)}</td>
                 </tr>
               ))}
@@ -237,21 +298,33 @@ export function ConsolidatedClientInvoicePreview({
       {/* Final amount due */}
       <section className="grid grid-cols-3 gap-4 mt-4">
         <div className="col-span-2 border rounded p-3 bg-neutral-50 text-[10.5px]">
-          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">{t.paymentInformation}</div>
+          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">
+            {t.paymentInformation}
+          </div>
           <div className="grid grid-cols-2 gap-1">
             {settings.defaultBank.bankName && <KV k={t.bank} v={settings.defaultBank.bankName} />}
-            {settings.defaultBank.accountNumber && <KV k={t.account} v={settings.defaultBank.accountNumber} />}
+            {settings.defaultBank.accountNumber && (
+              <KV k={t.account} v={settings.defaultBank.accountNumber} />
+            )}
             {settings.defaultBank.iban && <KV k={t.iban} v={settings.defaultBank.iban} />}
             {settings.defaultBank.swift && <KV k={t.swift} v={settings.defaultBank.swift} />}
             {dueDate && <KV k={t.dueDate} v={formatDate(dueDate)} />}
           </div>
-          {settings.defaultBank.notes && <div className="mt-1 text-neutral-600">{settings.defaultBank.notes}</div>}
+          {settings.defaultBank.notes && (
+            <div className="mt-1 text-neutral-600">{settings.defaultBank.notes}</div>
+          )}
         </div>
         <div className="border-2 border-amber-500 rounded p-3 bg-amber-50 text-center">
-          <div className="text-[10px] uppercase tracking-wider text-neutral-600">{t.totalAmountDueNow}</div>
-          <div className="text-[24px] font-extrabold doc-navy mt-1">{formatMoney(finalDue, cur)}</div>
+          <div className="text-[10px] uppercase tracking-wider text-neutral-600">
+            {t.totalAmountDueNow}
+          </div>
+          <div className="text-[24px] font-extrabold doc-navy mt-1">
+            {formatMoney(finalDue, cur)}
+          </div>
           {account.totals.creditBalance > 0 && (
-            <div className="text-[10px] text-emerald-700 mt-1">{t.creditBalance}: {formatMoney(account.totals.creditBalance, cur)}</div>
+            <div className="text-[10px] text-emerald-700 mt-1">
+              {t.creditBalance}: {formatMoney(account.totals.creditBalance, cur)}
+            </div>
           )}
         </div>
       </section>
@@ -262,11 +335,18 @@ export function ConsolidatedClientInvoicePreview({
 }
 
 function KV({ k, v }: { k: string; v: string }) {
-  return <div className="flex justify-between gap-2"><span className="text-neutral-500">{k}:</span><span className="font-medium">{v}</span></div>;
+  return (
+    <div className="flex justify-between gap-2">
+      <span className="text-neutral-500">{k}:</span>
+      <span className="font-medium">{v}</span>
+    </div>
+  );
 }
 function SBox({ k, v, highlight = false }: { k: string; v: string; highlight?: boolean }) {
   return (
-    <div className={`border rounded p-2 ${highlight ? "border-2 border-amber-500 bg-amber-50" : "bg-white"}`}>
+    <div
+      className={`border rounded p-2 ${highlight ? "border-2 border-amber-500 bg-amber-50" : "bg-white"}`}
+    >
       <div className="text-[9px] uppercase text-neutral-500">{k}</div>
       <div className={`font-bold doc-navy ${highlight ? "text-[14px]" : "text-[12px]"}`}>{v}</div>
     </div>

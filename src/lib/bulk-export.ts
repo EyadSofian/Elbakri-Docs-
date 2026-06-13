@@ -4,9 +4,9 @@ import { toast } from "sonner";
 async function waitForImages(root: HTMLElement) {
   const imgs = Array.from(root.querySelectorAll("img"));
   await Promise.all(
-    imgs.map(img => {
+    imgs.map((img) => {
       if (img.complete && img.naturalWidth > 0) return Promise.resolve();
-      return new Promise<void>(res => {
+      return new Promise<void>((res) => {
         img.addEventListener("load", () => res(), { once: true });
         img.addEventListener("error", () => res(), { once: true });
       });
@@ -17,10 +17,13 @@ async function waitForImages(root: HTMLElement) {
 async function renderToCanvas(el: HTMLElement) {
   const { default: html2canvas } = await import("html2canvas-pro");
   await waitForImages(el);
-  await new Promise(r => setTimeout(r, 60));
+  await new Promise((r) => setTimeout(r, 60));
   return html2canvas(el, {
-    scale: 2, useCORS: true, allowTaint: true,
-    backgroundColor: "#ffffff", logging: false,
+    scale: 2,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: "#ffffff",
+    logging: false,
   });
 }
 
@@ -90,7 +93,9 @@ export async function exportZip(slides: BulkSlide[], zipFilename: string) {
   const id = toast.loading(`Generating ZIP (${slides.length} invoices)…`);
   try {
     const [{ default: JSZip }, { default: jsPDF }, { saveAs }] = await Promise.all([
-      import("jszip"), import("jspdf"), import("file-saver"),
+      import("jszip"),
+      import("jspdf"),
+      import("file-saver"),
     ]);
     const zip = new JSZip();
     for (let i = 0; i < slides.length; i++) {
@@ -112,6 +117,9 @@ export async function exportZip(slides: BulkSlide[], zipFilename: string) {
 }
 
 export function bulkFilename(prefix: string, parts: (string | undefined)[]) {
-  const safe = parts.filter(Boolean).map(p => String(p).replace(/[^\w\-]+/g, "_")).join("-");
+  const safe = parts
+    .filter(Boolean)
+    .map((p) => String(p).replace(/[^\w-]+/g, "_"))
+    .join("-");
   return `${prefix}-${safe}`.slice(0, 120);
 }

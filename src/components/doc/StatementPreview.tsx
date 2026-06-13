@@ -3,16 +3,22 @@ import type { Statement } from "@/lib/storage";
 import { formatDate, formatMoney } from "@/lib/format";
 import { tt, type Lang } from "@/lib/i18n";
 
-export function StatementPreview({ statement, lang = "en" }: { statement: Statement; lang?: Lang }) {
+export function StatementPreview({
+  statement,
+  lang = "en",
+}: {
+  statement: Statement;
+  lang?: Lang;
+}) {
   const t = tt(lang);
   const dir = lang === "ar" ? "rtl" : "ltr";
   let running = statement.openingBalance;
-  const rows = statement.transactions.map(tx => {
-    running = running + (Number(tx.debit)||0) - (Number(tx.credit)||0);
+  const rows = statement.transactions.map((tx) => {
+    running = running + (Number(tx.debit) || 0) - (Number(tx.credit) || 0);
     return { ...tx, balance: running };
   });
-  const totalDebit = statement.transactions.reduce((s,tx) => s + (Number(tx.debit)||0), 0);
-  const totalCredit = statement.transactions.reduce((s,tx) => s + (Number(tx.credit)||0), 0);
+  const totalDebit = statement.transactions.reduce((s, tx) => s + (Number(tx.debit) || 0), 0);
+  const totalCredit = statement.transactions.reduce((s, tx) => s + (Number(tx.credit) || 0), 0);
   const closing = statement.openingBalance + totalDebit - totalCredit;
   const cur = statement.currency;
 
@@ -26,18 +32,38 @@ export function StatementPreview({ statement, lang = "en" }: { statement: Statem
 
       <section className="grid grid-cols-2 gap-6 mb-4">
         <div>
-          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">{t.customer}</div>
-          <div className="doc-navy font-semibold text-[13px]">{statement.customerName || statement.accountName || "—"}</div>
+          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">
+            {t.customer}
+          </div>
+          <div className="doc-navy font-semibold text-[13px]">
+            {statement.customerName || statement.accountName || "—"}
+          </div>
           <div className="text-[10.5px] text-neutral-600">
-            {statement.accountName && <div>{t.account}: {statement.accountName}</div>}
-            {statement.accountNumber && <div>{t.no}: {statement.accountNumber}</div>}
-            <div>{t.currency}: {cur}</div>
+            {statement.accountName && (
+              <div>
+                {t.account}: {statement.accountName}
+              </div>
+            )}
+            {statement.accountNumber && (
+              <div>
+                {t.no}: {statement.accountNumber}
+              </div>
+            )}
+            <div>
+              {t.currency}: {cur}
+            </div>
           </div>
         </div>
         <div className="text-right">
-          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">{t.preparedBy}</div>
-          <div className="text-[10.5px]"><span className="font-medium">{statement.preparedBy || "—"}</span></div>
-          <div className="text-[10.5px]">{t.printedAt}: {new Date().toLocaleString(lang === "ar" ? "ar-EG" : "en-GB")}</div>
+          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">
+            {t.preparedBy}
+          </div>
+          <div className="text-[10.5px]">
+            <span className="font-medium">{statement.preparedBy || "—"}</span>
+          </div>
+          <div className="text-[10.5px]">
+            {t.printedAt}: {new Date().toLocaleString(lang === "ar" ? "ar-EG" : "en-GB")}
+          </div>
         </div>
       </section>
 
@@ -48,7 +74,9 @@ export function StatementPreview({ statement, lang = "en" }: { statement: Statem
         </div>
         <div className="border rounded p-2 bg-neutral-50">
           <div className="text-[9px] uppercase text-neutral-500">{t.openingBalance}</div>
-          <div className="text-[14px] font-bold doc-navy">{formatMoney(statement.openingBalance, cur)}</div>
+          <div className="text-[14px] font-bold doc-navy">
+            {formatMoney(statement.openingBalance, cur)}
+          </div>
         </div>
         <div className="border rounded p-2 bg-neutral-50">
           <div className="text-[9px] uppercase text-neutral-500">{t.totalDebit}</div>
@@ -60,7 +88,9 @@ export function StatementPreview({ statement, lang = "en" }: { statement: Statem
         </div>
         <div className="border-2 border-amber-500 rounded p-2 bg-amber-50">
           <div className="text-[9px] uppercase text-neutral-500">{t.closingBalance}</div>
-          <div className="text-[14px] font-bold doc-navy">{formatMoney(Math.abs(closing), cur)} {closing >= 0 ? "Dr" : "Cr"}</div>
+          <div className="text-[14px] font-bold doc-navy">
+            {formatMoney(Math.abs(closing), cur)} {closing >= 0 ? "Dr" : "Cr"}
+          </div>
         </div>
       </div>
 
@@ -83,7 +113,9 @@ export function StatementPreview({ statement, lang = "en" }: { statement: Statem
             <td className="font-semibold doc-navy">{t.openingBalance}</td>
             <td></td>
             <td></td>
-            <td className="text-right font-semibold doc-navy">{formatMoney(statement.openingBalance, cur)}</td>
+            <td className="text-right font-semibold doc-navy">
+              {formatMoney(statement.openingBalance, cur)}
+            </td>
             <td className="text-center">{statement.openingBalance >= 0 ? "Dr" : "Cr"}</td>
           </tr>
           {rows.map((tx) => (
@@ -99,7 +131,9 @@ export function StatementPreview({ statement, lang = "en" }: { statement: Statem
             </tr>
           ))}
           <tr className="doc-gold-bg">
-            <td colSpan={4} className="font-bold uppercase text-[10px] tracking-wider">{t.closing}</td>
+            <td colSpan={4} className="font-bold uppercase text-[10px] tracking-wider">
+              {t.closing}
+            </td>
             <td className="text-right font-bold">{formatMoney(totalDebit, cur)}</td>
             <td className="text-right font-bold">{formatMoney(totalCredit, cur)}</td>
             <td className="text-right font-bold">{formatMoney(Math.abs(closing), cur)}</td>

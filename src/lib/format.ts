@@ -1,7 +1,11 @@
 import type { Currency, ServiceItem } from "./storage";
 
 const CUR_SYMBOL: Record<Currency, string> = {
-  USD: "$", EUR: "€", EGP: "EGP ", SAR: "SAR ", AED: "AED ",
+  USD: "$",
+  EUR: "€",
+  EGP: "EGP ",
+  SAR: "SAR ",
+  AED: "AED ",
 };
 
 export function formatMoney(value: number, currency: Currency) {
@@ -12,8 +16,15 @@ export function formatMoney(value: number, currency: Currency) {
 
 export function formatDate(iso: string) {
   if (!iso) return "—";
-  try { return new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }); }
-  catch { return iso; }
+  try {
+    return new Date(iso).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  } catch {
+    return iso;
+  }
 }
 
 export function nightsBetween(a: string, b: string): number {
@@ -39,23 +50,23 @@ export function computeItemTotal(item: ServiceItem): number {
     case "tour": {
       const adults = Number(m.adults) || 0;
       const children = Number(m.children) || 0;
-      return (Number(m.priceAdult)||0)*adults + (Number(m.priceChild)||0)*children;
+      return (Number(m.priceAdult) || 0) * adults + (Number(m.priceChild) || 0) * children;
     }
     case "activity": {
       const persons = Number(m.persons) || 0;
-      return (Number(item.unitPrice)||0) * persons;
+      return (Number(item.unitPrice) || 0) * persons;
     }
     case "transfer": {
       const vehicles = Number(m.vehicles) || 1;
-      return (Number(item.unitPrice)||0) * vehicles;
+      return (Number(item.unitPrice) || 0) * vehicles;
     }
     case "package": {
       const adults = Number(m.adults) || 0;
       const children = Number(m.children) || 0;
-      return (Number(m.priceAdult)||0)*adults + (Number(m.priceChild)||0)*children;
+      return (Number(m.priceAdult) || 0) * adults + (Number(m.priceChild) || 0) * children;
     }
     default:
-      return (Number(item.quantity)||0) * (Number(item.unitPrice)||0);
+      return (Number(item.quantity) || 0) * (Number(item.unitPrice) || 0);
   }
 }
 
@@ -75,12 +86,13 @@ export function computeInvoiceTotals(opts: {
   totalOverride: number | null;
 }): InvoiceTotals {
   const subtotal = opts.items.reduce((s, it) => s + (Number(it.total) || 0), 0);
-  const discount = opts.discountType === "percent"
-    ? subtotal * (Number(opts.discountValue)||0) / 100
-    : (Number(opts.discountValue)||0);
+  const discount =
+    opts.discountType === "percent"
+      ? (subtotal * (Number(opts.discountValue) || 0)) / 100
+      : Number(opts.discountValue) || 0;
   const taxable = Math.max(0, subtotal - discount);
-  const vat = taxable * (Number(opts.vatPercent)||0) / 100;
+  const vat = (taxable * (Number(opts.vatPercent) || 0)) / 100;
   const grandTotal = opts.totalOverride != null ? opts.totalOverride : taxable + vat;
-  const balance = grandTotal - (Number(opts.paidAmount)||0);
+  const balance = grandTotal - (Number(opts.paidAmount) || 0);
   return { subtotal, vat, discount, grandTotal, balance };
 }

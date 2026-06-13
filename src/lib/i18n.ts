@@ -181,7 +181,6 @@ export const T = {
     generateConsolidated: "Generate Consolidated Invoice",
   },
   ar: {
-
     taxInvoice: "فاتورة ضريبية",
     travelServices: "خدمات سفر وسياحة",
     statementOfAccount: "كشف حساب",
@@ -360,7 +359,6 @@ export const T = {
     generateConsolidated: "إنشاء فاتورة مجمعة",
   },
 } as const;
-
 
 export function tt(lang: Lang) {
   return T[lang];

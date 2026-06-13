@@ -6,9 +6,9 @@ export type PdfOrientation = "portrait" | "landscape";
 async function waitForImages(root: HTMLElement) {
   const imgs = Array.from(root.querySelectorAll("img"));
   await Promise.all(
-    imgs.map(img => {
+    imgs.map((img) => {
       if (img.complete && img.naturalWidth > 0) return Promise.resolve();
-      return new Promise<void>(res => {
+      return new Promise<void>((res) => {
         img.addEventListener("load", () => res(), { once: true });
         img.addEventListener("error", () => res(), { once: true });
       });
@@ -22,11 +22,11 @@ export async function exportElementToPdf(
   orientation: PdfOrientation = "portrait",
 ) {
   if (typeof window === "undefined") return;
-  const safe = filename.replace(/[^\w.\-]+/g, "_") + (filename.endsWith(".pdf") ? "" : ".pdf");
+  const safe = filename.replace(/[^\w.-]+/g, "_") + (filename.endsWith(".pdf") ? "" : ".pdf");
   const id = toast.loading("Generating PDF…");
   try {
     await waitForImages(element);
-    await new Promise(r => setTimeout(r, 80));
+    await new Promise((r) => setTimeout(r, 80));
 
     const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
       import("html2canvas-pro"),
@@ -89,5 +89,5 @@ export function printElement(element: HTMLElement) {
 }
 
 export function sanitizeFilenamePart(s: string) {
-  return (s || "").replace(/[^\w\-]+/g, "_").slice(0, 60) || "doc";
+  return (s || "").replace(/[^\w-]+/g, "_").slice(0, 60) || "doc";
 }

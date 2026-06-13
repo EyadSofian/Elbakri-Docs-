@@ -5,7 +5,12 @@ import { formatDate, formatMoney } from "@/lib/format";
 import { tt, type Lang } from "@/lib/i18n";
 
 export function ConsolidatedInvoicePreview({
-  client, account, periodFrom, periodTo, lang = "en", number,
+  client,
+  account,
+  periodFrom,
+  periodTo,
+  lang = "en",
+  number,
 }: {
   client: Client;
   account: ClientAccount;
@@ -28,7 +33,7 @@ export function ConsolidatedInvoicePreview({
 
   const due = account.invoices
     .filter(filterRange)
-    .filter(r => r.invoice.status !== "Cancelled" && r.remaining > 0.0001);
+    .filter((r) => r.invoice.status !== "Cancelled" && r.remaining > 0.0001);
 
   const totalInvoiced = due.reduce((s, r) => s + r.grandTotal, 0);
   const totalPaid = due.reduce((s, r) => s + r.paidAmount, 0);
@@ -48,9 +53,13 @@ export function ConsolidatedInvoicePreview({
 
       <section className="grid grid-cols-2 gap-6 mb-4">
         <div>
-          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">{t.billTo}</div>
+          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">
+            {t.billTo}
+          </div>
           <div className="doc-navy font-semibold text-[13px]">{client.name || "—"}</div>
-          {client.address && <div className="text-[10px] text-neutral-600 whitespace-pre-line">{client.address}</div>}
+          {client.address && (
+            <div className="text-[10px] text-neutral-600 whitespace-pre-line">{client.address}</div>
+          )}
           <div className="text-[10px] text-neutral-600 mt-1 space-y-0.5">
             {client.email && <div>Email: {client.email}</div>}
             {client.phone && <div>Phone: {client.phone}</div>}
@@ -58,11 +67,15 @@ export function ConsolidatedInvoicePreview({
           </div>
         </div>
         <div className="text-right">
-          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">{t.statementPeriod}</div>
+          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">
+            {t.statementPeriod}
+          </div>
           <div className="text-[11px] font-medium">
             {periodFrom ? formatDate(periodFrom) : "—"} → {periodTo ? formatDate(periodTo) : "—"}
           </div>
-          <div className="text-[10px] text-neutral-600 mt-1">{t.currency}: {cur}</div>
+          <div className="text-[10px] text-neutral-600 mt-1">
+            {t.currency}: {cur}
+          </div>
         </div>
       </section>
 
@@ -87,7 +100,11 @@ export function ConsolidatedInvoicePreview({
         </thead>
         <tbody>
           {due.length === 0 && (
-            <tr><td colSpan={8} className="text-center text-neutral-400 py-6">No outstanding invoices.</td></tr>
+            <tr>
+              <td colSpan={8} className="text-center text-neutral-400 py-6">
+                No outstanding invoices.
+              </td>
+            </tr>
           )}
           {due.map((r, i) => (
             <tr key={r.invoice.id} className="border-t border-neutral-200 align-top">
@@ -95,8 +112,16 @@ export function ConsolidatedInvoicePreview({
               <td>{formatDate(r.invoice.date)}</td>
               <td className="font-semibold doc-navy">{r.invoice.number}</td>
               <td>
-                {r.invoice.bookingRef && <div className="text-[9.5px] text-neutral-500">Ref {r.invoice.bookingRef}</div>}
-                <div>{r.invoice.items.map(it => it.description || it.type).filter(Boolean).slice(0, 3).join(", ") || "—"}</div>
+                {r.invoice.bookingRef && (
+                  <div className="text-[9.5px] text-neutral-500">Ref {r.invoice.bookingRef}</div>
+                )}
+                <div>
+                  {r.invoice.items
+                    .map((it) => it.description || it.type)
+                    .filter(Boolean)
+                    .slice(0, 3)
+                    .join(", ") || "—"}
+                </div>
                 <div className="text-[9.5px] text-neutral-500 uppercase">{r.effectiveStatus}</div>
               </td>
               <td>{formatDate(r.invoice.dueDate)}</td>
@@ -106,7 +131,9 @@ export function ConsolidatedInvoicePreview({
             </tr>
           ))}
           <tr className="doc-gold-bg">
-            <td colSpan={5} className="font-bold uppercase text-[10px] tracking-wider">{t.grandTotalDue}</td>
+            <td colSpan={5} className="font-bold uppercase text-[10px] tracking-wider">
+              {t.grandTotalDue}
+            </td>
             <td className="text-right font-bold">{formatMoney(totalInvoiced, cur)}</td>
             <td className="text-right font-bold">{formatMoney(totalPaid, cur)}</td>
             <td className="text-right font-bold">{formatMoney(totalDue, cur)}</td>
@@ -126,9 +153,19 @@ export function ConsolidatedInvoicePreview({
   );
 }
 
-function Stat({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
+function Stat({
+  label,
+  value,
+  highlight = false,
+}: {
+  label: string;
+  value: string;
+  highlight?: boolean;
+}) {
   return (
-    <div className={`border rounded p-2 ${highlight ? "border-2 border-amber-500 bg-amber-50" : "bg-neutral-50"}`}>
+    <div
+      className={`border rounded p-2 ${highlight ? "border-2 border-amber-500 bg-amber-50" : "bg-neutral-50"}`}
+    >
       <div className="text-[9px] uppercase text-neutral-500">{label}</div>
       <div className="text-[14px] font-bold doc-navy">{value}</div>
     </div>

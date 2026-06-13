@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   FileText,
@@ -63,7 +63,7 @@ const groups = [
 ];
 
 export function AppSidebar() {
-  const pathname = useRouterState({ select: (s: any) => s.location.pathname });
+  const { pathname } = useLocation();
   const isActive = (url: string) =>
     url === "/" ? pathname === "/" : pathname === url || pathname.startsWith(url + "/");
 

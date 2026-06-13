@@ -1,26 +1,32 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Plus, Trash2, Edit3, Save, X } from "lucide-react";
 import {
-  useClients, emptyClient, CLIENT_TYPES,
-  type Client, type ClientType, type Currency, uid,
+  useClients,
+  emptyClient,
+  CLIENT_TYPES,
+  type Client,
+  type ClientType,
+  type Currency,
 } from "@/lib/storage";
 import { toast } from "sonner";
+import { useDocumentTitle } from "@/lib/use-document-title";
 
 const CURRENCIES: Currency[] = ["USD", "EUR", "EGP", "SAR", "AED"];
 
-export const Route = createFileRoute("/clients")({
-  head: () => ({ meta: [{ title: "Clients & Agencies — Elbakri Overseas" }] }),
-  component: ClientsPage,
-});
-
-function ClientsPage() {
+export default function ClientsPage() {
+  useDocumentTitle("Clients & Agencies — Elbakri Overseas");
   const [clients, setClients] = useClients();
   const [editing, setEditing] = useState<Client | null>(null);
   const [q, setQ] = useState("");
@@ -118,15 +124,37 @@ function ClientsPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <F label="Client type">
-                  <Select value={editing.type ?? "company"} onValueChange={(v) => setEditing({ ...editing, type: v as ClientType })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>{CLIENT_TYPES.map((ct) => <SelectItem key={ct.value} value={ct.value}>{ct.label}</SelectItem>)}</SelectContent>
+                  <Select
+                    value={editing.type ?? "company"}
+                    onValueChange={(v) => setEditing({ ...editing, type: v as ClientType })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CLIENT_TYPES.map((ct) => (
+                        <SelectItem key={ct.value} value={ct.value}>
+                          {ct.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
                   </Select>
                 </F>
                 <F label="Currency">
-                  <Select value={editing.currency ?? "USD"} onValueChange={(v) => setEditing({ ...editing, currency: v as Currency })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>{CURRENCIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                  <Select
+                    value={editing.currency ?? "USD"}
+                    onValueChange={(v) => setEditing({ ...editing, currency: v as Currency })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CURRENCIES.map((c) => (
+                        <SelectItem key={c} value={c}>
+                          {c}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
                   </Select>
                 </F>
                 <F label="Name / agency" className="col-span-2">

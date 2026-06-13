@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,15 +14,12 @@ import {
 import { Save } from "lucide-react";
 import { useSettings, type CompanySettings, type Currency } from "@/lib/storage";
 import { toast } from "sonner";
+import { useDocumentTitle } from "@/lib/use-document-title";
 
 const logoUrl = "/elbakri-logo.svg";
 
-export const Route = createFileRoute("/settings")({
-  head: () => ({ meta: [{ title: "Company Settings — Elbakri Overseas" }] }),
-  component: SettingsPage,
-});
-
-function SettingsPage() {
+export default function SettingsPage() {
+  useDocumentTitle("Company Settings — Elbakri Overseas");
   const [settings, setSettings] = useSettings();
   const [s, setS] = useState<CompanySettings>(settings);
   const save = () => {

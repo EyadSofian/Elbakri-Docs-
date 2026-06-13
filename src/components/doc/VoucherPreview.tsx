@@ -7,7 +7,9 @@ function Row({ label, value }: { label: string; value?: string | number }) {
   if (!value && value !== 0) return null;
   return (
     <tr className="border-t border-neutral-200">
-      <td className="bg-neutral-50 font-semibold doc-navy text-[10.5px] uppercase tracking-wide w-44">{label}</td>
+      <td className="bg-neutral-50 font-semibold doc-navy text-[10.5px] uppercase tracking-wide w-44">
+        {label}
+      </td>
       <td className="text-[11px]">{value}</td>
     </tr>
   );
@@ -19,18 +21,28 @@ export function VoucherPreview({ voucher, lang = "en" }: { voucher: Voucher; lan
   const nights = nightsBetween(voucher.checkIn, voucher.checkOut);
 
   // Children ages, e.g. "4 years, 8 years".
-  const ages = (voucher.childrenAges ?? []).filter((a) => a !== null && a !== undefined && String(a) !== "");
+  const ages = (voucher.childrenAges ?? []).filter(
+    (a) => a !== null && a !== undefined && String(a) !== "",
+  );
   const childrenAgesText =
     voucher.children > 0 && ages.length > 0 ? ages.map((a) => `${a} ${t.years}`).join("، ") : "";
 
   // Identification requirements default ON; uses the standard text when the
   // field is left empty, and can be hidden via showIdentification.
   const showId = voucher.showIdentification !== false;
-  const idText = showId ? (voucher.identificationRequirements?.trim() || t.identificationDefault) : "";
+  const idText = showId
+    ? voucher.identificationRequirements?.trim() || t.identificationDefault
+    : "";
 
   const hasPolicies =
-    voucher.checkInOutTimes || voucher.checkInRestrictions || voucher.ageRequirements || voucher.petsPolicy ||
-    voucher.frontDeskNotes || idText || voucher.childrenExtraBedPolicy || voucher.diningNotes;
+    voucher.checkInOutTimes ||
+    voucher.checkInRestrictions ||
+    voucher.ageRequirements ||
+    voucher.petsPolicy ||
+    voucher.frontDeskNotes ||
+    idText ||
+    voucher.childrenExtraBedPolicy ||
+    voucher.diningNotes;
 
   return (
     <div className="doc-sheet" dir={dir}>
@@ -45,7 +57,10 @@ export function VoucherPreview({ voucher, lang = "en" }: { voucher: Voucher; lan
       <table className="border border-neutral-200 rounded overflow-hidden text-[11px]">
         <tbody>
           <Row label={t.serviceType} value={voucher.serviceType.toUpperCase()} />
-          <Row label={t.serviceProvider} value={`${voucher.providerName}${voucher.hotelRating ? ` (${voucher.hotelRating}★)` : ""}`} />
+          <Row
+            label={t.serviceProvider}
+            value={`${voucher.providerName}${voucher.hotelRating ? ` (${voucher.hotelRating}★)` : ""}`}
+          />
           <Row label={t.address} value={voucher.address} />
           {/* Hotel phone (Tel/Fax) is intentionally NOT printed on the voucher. */}
           <Row label={t.serviceBookingRef} value={voucher.serviceBookingRef} />
@@ -61,7 +76,9 @@ export function VoucherPreview({ voucher, lang = "en" }: { voucher: Voucher; lan
       </table>
 
       <div className="mt-4">
-        <div className="doc-gold-bg px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider">{t.reservationSummary}</div>
+        <div className="doc-gold-bg px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider">
+          {t.reservationSummary}
+        </div>
         <table className="border border-neutral-200 border-t-0 text-[11px]">
           <thead>
             <tr className="bg-neutral-100">
@@ -88,7 +105,9 @@ export function VoucherPreview({ voucher, lang = "en" }: { voucher: Voucher; lan
 
       {hasPolicies && (
         <div className="mt-4">
-          <div className="doc-navy-bg px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider">{t.hotelInfoPolicies}</div>
+          <div className="doc-navy-bg px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider">
+            {t.hotelInfoPolicies}
+          </div>
           <table className="border border-neutral-200 border-t-0 text-[11px] w-full">
             <tbody>
               <Row label="Check-in / out" value={voucher.checkInOutTimes} />
