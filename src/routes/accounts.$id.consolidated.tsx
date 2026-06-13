@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { createFileRoute, useParams, Link, Navigate } from "@tanstack/react-router";
+import { createFileRoute, useParams, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Download, Printer } from "lucide-react";
 import {
   useClients, useInvoices, usePayments, useCreditNotes, useDebitNotes,
-  useRefunds, useAdjustments, type Currency,
+  useRefunds, useAdjustments, type Currency, type Client,
 } from "@/lib/storage";
 import { computeClientAccount } from "@/lib/account";
 import { ConsolidatedClientInvoicePreview, type ConsolidatedFilters } from "@/components/account/ConsolidatedClientInvoicePreview";
@@ -28,15 +28,28 @@ const CURRENCIES: Currency[] = ["USD", "EUR", "EGP", "SAR", "AED"];
 function ConsolidatedPage() {
   const { id } = useParams({ from: "/accounts/$id/consolidated" });
   const [clients] = useClients();
+  const client = clients.find(c => c.id === id);
+  if (!client) {
+    return (
+      <div className="p-10 text-center space-y-3">
+        <div className="text-sm text-muted-foreground">
+          {clients.length === 0 ? "Loading account…" : "Client not found."}
+        </div>
+        <Link to="/accounts" className="text-sm underline doc-navy">Back to client accounts</Link>
+      </div>
+    );
+  }
+  return <ConsolidatedView key={client.id} client={client} />;
+}
+
+function ConsolidatedView({ client }: { client: Client }) {
+  const id = client.id;
   const [invoices] = useInvoices();
   const [payments] = usePayments();
   const [creditNotes] = useCreditNotes();
   const [debitNotes] = useDebitNotes();
   const [refunds] = useRefunds();
   const [adjustments] = useAdjustments();
-
-  const client = clients.find(c => c.id === id);
-  if (!client) return <Navigate to="/accounts" />;
 
   const [currency, setCurrency] = useState<Currency>(() => {
     const first = invoices.find(i => i.clientId === id);

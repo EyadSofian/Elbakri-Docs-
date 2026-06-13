@@ -49,9 +49,13 @@ export function computeInvoiceLedger(
   today = new Date(),
 ): InvoiceLedger {
   const totals = computeInvoiceTotals(invoice);
+  const allocated = paymentsForInvoice(invoice.id, payments);
   const baseline = Number(invoice.paidAmount) || 0;
   const original = totals.grandTotal;
-  const paid = Math.max(0, baseline + paymentsForInvoice(invoice.id, payments));
+  // Payment allocations are the source of truth. The stored paidAmount field is
+  // only a fallback for simple invoices that never received a linked Payment —
+  // summing both (the old behaviour) double-counted partial payments.
+  const paid = Math.max(0, allocated > 0 ? allocated : baseline);
   const creditApplied = creditNotesForInvoice(invoice.id, creditNotes);
   const cancelled = invoice.status === "Cancelled" ? original : 0;
   const remaining = invoice.status === "Cancelled"
@@ -355,7 +359,8 @@ export function deriveInvoiceStatus(
   inv: Invoice, paidFromPayments: number, today = new Date(),
 ): { paidAmount: number; remaining: number; status: DocStatus; daysOverdue: number; grandTotal: number } {
   const totals = computeInvoiceTotals(inv);
-  const paid = Math.max(0, (Number(inv.paidAmount) || 0) + paidFromPayments);
+  // Allocations win over the stored paidAmount fallback (see computeInvoiceLedger).
+  const paid = Math.max(0, paidFromPayments > 0 ? paidFromPayments : (Number(inv.paidAmount) || 0));
   const remaining = Math.max(0, totals.grandTotal - paid);
   let status: DocStatus = inv.status;
   if (inv.status === "Cancelled" || inv.status === "Draft") {

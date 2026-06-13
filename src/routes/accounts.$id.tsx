@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { createFileRoute, useParams, Link, Navigate } from "@tanstack/react-router";
+import { createFileRoute, useParams, Link } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ import {
 import { toast } from "sonner";
 import {
   useClients, useInvoices, usePayments, useCreditNotes, useDebitNotes, useRefunds, useAdjustments,
-  PAYMENT_METHODS, type Currency, type DocStatus,
+  PAYMENT_METHODS, type Currency, type DocStatus, type Client,
 } from "@/lib/storage";
 import { computeClientAccount, buildLedger } from "@/lib/account";
 import { formatDate, formatMoney } from "@/lib/format";
@@ -41,15 +41,33 @@ const CURRENCY_OPTIONS: Currency[] = ["USD", "EUR", "EGP", "SAR", "AED"];
 function ClientAccountPage() {
   const { id } = useParams({ from: "/accounts/$id" });
   const [clients] = useClients();
+  const client = clients.find(c => c.id === id);
+
+  // NOTE: all stateful hooks live in ClientAccountView so that hook order is
+  // never affected by whether the client exists. Returning before hooks (the
+  // previous behaviour) crashed React with "rendered more hooks than during the
+  // previous render" once the async client list loaded.
+  if (!client) {
+    return (
+      <div className="p-10 text-center space-y-3">
+        <div className="text-sm text-muted-foreground">
+          {clients.length === 0 ? "Loading account…" : "Client not found."}
+        </div>
+        <Link to="/accounts" className="text-sm underline doc-navy">Back to client accounts</Link>
+      </div>
+    );
+  }
+  return <ClientAccountView key={client.id} client={client} />;
+}
+
+function ClientAccountView({ client }: { client: Client }) {
+  const id = client.id;
   const [invoices, setInvoices] = useInvoices();
   const [payments, setPayments] = usePayments();
   const [creditNotes, setCreditNotes] = useCreditNotes();
   const [debitNotes, setDebitNotes] = useDebitNotes();
   const [refunds, setRefunds] = useRefunds();
   const [adjustments, setAdjustments] = useAdjustments();
-
-  const client = clients.find(c => c.id === id);
-  if (!client) return <Navigate to="/accounts" />;
 
   const [currency, setCurrency] = useState<Currency>(() => {
     const first = invoices.find(i => i.clientId === id || i.client.name?.toLowerCase() === client.name.toLowerCase());
@@ -214,9 +232,9 @@ function ClientAccountPage() {
             <Card><CardContent className="pt-4">
               <div className="text-xs font-semibold mb-2 doc-navy">Invoice mix</div>
               <div className="text-xs grid grid-cols-2 gap-1">
-                <span>Paid</span><span className="text-right">{account.totals.paidCount}</span>
-                <span>Partial</span><span className="text-right">{account.totals.partialCount}</span>
-                <span>Unpaid / Overdue</span><span className="text-right">{account.totals.unpaidCount}</span>
+                <span>Fully paid invoices</span><span className="text-right">{account.totals.paidCount}</span>
+                <span>Partial invoices</span><span className="text-right">{account.totals.partialCount}</span>
+                <span>Unpaid / overdue</span><span className="text-right">{account.totals.unpaidCount}</span>
                 <span>Overdue</span><span className="text-right text-destructive">{account.totals.overdueCount}</span>
                 <span>Cancelled</span><span className="text-right text-muted-foreground">{account.totals.cancelledCount}</span>
               </div>

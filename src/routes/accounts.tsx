@@ -77,7 +77,7 @@ function AccountsPage() {
                 {account.totals.creditBalance > 0 && <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100">Credit {formatMoney(account.totals.creditBalance, account.currency)}</Badge>}
               </div>
               <div className="text-xs text-muted-foreground truncate">
-                {account.totals.invoiceCount} invoices · Paid {account.totals.paidCount} · Partial {account.totals.partialCount} · Unpaid {account.totals.unpaidCount}
+                {account.totals.invoiceCount} invoices · {account.totals.paidCount} fully paid · {account.totals.partialCount} partial · {account.totals.unpaidCount} unpaid
               </div>
             </div>
             <div className="hidden md:grid grid-cols-3 gap-4 text-right text-xs shrink-0">

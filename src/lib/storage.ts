@@ -58,7 +58,7 @@ export interface ServiceItem {
   unitPrice: number;
   total: number;
   notes: string;
-  meta: Record<string, unknown>;
+  meta: Record<string, any>;
 }
 
 export interface Client {
@@ -90,7 +90,7 @@ export interface ServiceTemplate {
   description: string;
   unit: string;
   unitPrice: number;
-  meta: Record<string, unknown>;
+  meta: Record<string, any>;
   notes: string;
 }
 
@@ -405,7 +405,9 @@ function subscribe(name: CollectionName, notify: () => void) {
   const set = listeners.get(name) ?? new Set<() => void>();
   set.add(notify);
   listeners.set(name, set);
-  return () => set.delete(notify);
+  return () => {
+    set.delete(notify);
+  };
 }
 
 async function fetchCollection<T extends StoreValue>(
