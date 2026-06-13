@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { nextVoucherNumber, useVouchers } from "@/lib/storage";
+import { nextVoucherNumberAsync, useVouchers } from "@/lib/storage";
 import { buildBlankVoucher } from "@/components/doc/VoucherEditor";
 
 export const Route = createFileRoute("/vouchers/new")({
@@ -12,10 +12,11 @@ function NewVoucher() {
   const [, setVouchers] = useVouchers();
   const nav = useNavigate();
   useEffect(() => {
-    const v = buildBlankVoucher({ number: nextVoucherNumber() });
-    setVouchers(prev => [v, ...prev]);
-    nav({ to: "/vouchers/$id", params: { id: v.id }, replace: true });
-  }, []);
+    void (async () => {
+      const v = buildBlankVoucher({ number: await nextVoucherNumberAsync() });
+      setVouchers((prev) => [v, ...prev]);
+      nav({ to: "/vouchers/$id", params: { id: v.id }, replace: true });
+    })();
+  }, [nav, setVouchers]);
   return <div className="p-6 text-sm text-muted-foreground">Creating voucher…</div>;
 }
-
