@@ -415,7 +415,11 @@ function hasLocalValue(key: string) {
 function writeLocal<T>(key: string, value: T) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(key, JSON.stringify(value));
-  window.dispatchEvent(new StorageEvent("storage", { key }));
+  // Do NOT dispatch a synthetic same-tab "storage" event here. Same-tab
+  // subscribers are already updated through setCached()'s listener notify, and
+  // re-entering setCached from a synthetic event (especially while inside a
+  // setValue updater) caused an infinite render loop that froze the browser.
+  // Real storage events still fire in OTHER tabs and are handled by onStorage.
 }
 
 function mergeSettings(settings: CompanySettings): CompanySettings {
@@ -513,16 +517,19 @@ function useStore<T extends StoreValue>(name: CollectionName, fallback: T) {
 
   const update = useCallback(
     (next: T | ((prev: T) => T)) => {
-      setValue((prev) => {
-        const v = typeof next === "function" ? (next as (p: T) => T)(prev) : next;
-        setCached(name, v);
-        writeLocal(key, v);
-        saveCollection(name, v).catch((error) => {
-          console.error(error);
-        });
-        return v;
+      // Side effects must run OUTSIDE a setValue updater. setCached() notifies
+      // every subscriber (calling their setValue), so doing it inside the
+      // updater was re-entrant and looped forever. Compute the next value from
+      // the shared cache, then let setCached drive each subscriber's setValue.
+      const current = (cache.get(name) as T | undefined) ?? readLocal(key, fallback);
+      const v = typeof next === "function" ? (next as (p: T) => T)(current) : next;
+      setCached(name, v);
+      writeLocal(key, v);
+      saveCollection(name, v).catch((error) => {
+        console.error(error);
       });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [name, key],
   );
 

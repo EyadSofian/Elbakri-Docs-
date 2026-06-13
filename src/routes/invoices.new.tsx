@@ -19,6 +19,9 @@ function NewInvoice() {
       setInvoices((prev) => [inv, ...prev]);
       nav({ to: "/invoices/$id", params: { id: inv.id }, replace: true });
     })();
-  }, [nav, setInvoices]);
+    // Run once on mount only (matches statements.new). Including nav/setInvoices
+    // here re-ran the effect and created duplicate invoices.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return <div className="p-6 text-sm text-muted-foreground">Creating invoice…</div>;
 }

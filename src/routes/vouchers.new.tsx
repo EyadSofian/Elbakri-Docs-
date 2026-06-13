@@ -17,6 +17,9 @@ function NewVoucher() {
       setVouchers((prev) => [v, ...prev]);
       nav({ to: "/vouchers/$id", params: { id: v.id }, replace: true });
     })();
-  }, [nav, setVouchers]);
+    // Run exactly once on mount — see invoices.new for why nav/setVouchers must
+    // NOT be dependencies (infinite create-and-navigate loop that froze the tab).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return <div className="p-6 text-sm text-muted-foreground">Creating voucher…</div>;
 }
