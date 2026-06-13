@@ -16,5 +16,19 @@ export default defineConfig({
   build: {
     outDir: "dist-static",
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "react-vendor": ["react", "react-dom", "@tanstack/react-router", "@tanstack/react-query"],
+          "ui-vendor": [
+            "@radix-ui/react-dialog",
+            "@radix-ui/react-dropdown-menu",
+            "@radix-ui/react-select",
+            "@radix-ui/react-tooltip",
+            "lucide-react",
+          ],
+        },
+      },
+    },
   },
 });

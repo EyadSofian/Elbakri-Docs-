@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Elbakri Overseas logo</title>
+  <desc id="desc">A navy and gold emblem for Elbakri Overseas.</desc>
+  <rect width="128" height="128" rx="18" fill="#ffffff" />
+  <circle cx="64" cy="54" r="34" fill="#0b1f3a" />
+  <path
+    d="M39 65c11-20 31-32 57-36-9 11-18 28-23 50-9-2-18-6-34-14Z"
+    fill="#d9a441"
+  />
+  <path
+    d="M33 58c16 10 35 15 58 15-14 10-32 14-53 11-5-7-7-15-5-26Z"
+    fill="#f2c66d"
+  />
+  <path
+    d="M46 47h38v9H56v8h24v9H46V47Z"
+    fill="#ffffff"
+  />
+  <text
+    x="64"
+    y="108"
+    text-anchor="middle"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="13"
+    font-weight="700"
+    fill="#0b1f3a"
+  >
+    ELBAKRI
+  </text>
+</svg>

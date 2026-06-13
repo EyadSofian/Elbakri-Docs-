@@ -1,13 +1,31 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
-  LayoutDashboard, FileText, Ticket, BookOpen, FolderOpen,
-  Users, Building2, Settings, Sparkles, Wallet, PackageOpen,
+  LayoutDashboard,
+  FileText,
+  Ticket,
+  BookOpen,
+  FolderOpen,
+  Users,
+  Building2,
+  Settings,
+  Sparkles,
+  Wallet,
+  PackageOpen,
 } from "lucide-react";
-import logoAsset from "@/assets/elbakri-logo.png.asset.json";
 import {
-  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
-  SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarFooter,
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
+
+const logoUrl = "/elbakri-logo.svg";
 
 const groups = [
   {
@@ -54,11 +72,15 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-3 px-2 py-3">
           <div className="size-10 rounded-md bg-white flex items-center justify-center shrink-0 overflow-hidden">
-            <img src={logoAsset.url} alt="Elbakri Overseas" className="w-9 h-9 object-contain" />
+            <img src={logoUrl} alt="Elbakri Overseas" className="w-9 h-9 object-contain" />
           </div>
           <div className="min-w-0 group-data-[collapsible=icon]:hidden">
-            <div className="text-sidebar-foreground font-semibold leading-tight truncate">Elbakri Overseas</div>
-            <div className="text-[10px] uppercase tracking-[0.18em] text-sidebar-primary">Est. 1982</div>
+            <div className="text-sidebar-foreground font-semibold leading-tight truncate">
+              Elbakri Overseas
+            </div>
+            <div className="text-[10px] uppercase tracking-[0.18em] text-sidebar-primary">
+              Est. 1982
+            </div>
           </div>
         </div>
       </SidebarHeader>
