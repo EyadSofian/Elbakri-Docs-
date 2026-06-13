@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Save, Download, Printer, Trash2, Copy } from "lucide-react";
 import { toast } from "sonner";
@@ -14,7 +15,7 @@ import { VoucherPreview } from "@/components/doc/VoucherPreview";
 import { PickerCombo } from "@/components/doc/PickerCombo";
 import { exportElementToPdf, printElement, sanitizeFilenamePart } from "@/lib/pdf";
 import { LanguageToggle } from "@/components/doc/LanguageToggle";
-import type { Lang } from "@/lib/i18n";
+import { RATE_BASIS, type Lang } from "@/lib/i18n";
 
 function Field({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) {
   return (
@@ -34,6 +35,18 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
   const nav = useNavigate();
 
   const patch = (p: Partial<Voucher>) => setVoucher(v => ({ ...v, ...p }));
+
+  // Children ages: keep the array length in sync with the children count.
+  const setChildrenCount = (n: number) => {
+    const count = Math.max(0, Math.floor(n) || 0);
+    const ages = (voucher.childrenAges ?? []).slice(0, count);
+    patch({ children: count, childrenAges: ages });
+  };
+  const setChildAge = (index: number, age: number) => {
+    const ages = [...(voucher.childrenAges ?? [])];
+    ages[index] = Math.max(0, Math.floor(age) || 0);
+    patch({ childrenAges: ages });
+  };
 
   const save = () => {
     setVouchers(prev => {
@@ -63,6 +76,8 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
 
   const pickSupplier = (s: Supplier | null) => {
     if (!s) return;
+    // Pull the phone into the editor (for the supplier DB) but it is never
+    // printed on the voucher PDF — see VoucherPreview.
     patch({ providerName: s.name, address: s.address, telFax: s.phone });
   };
   const saveSupplierToDb = () => {
@@ -114,8 +129,8 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
 
           <TabsContent value="provider">
             <Card><CardContent className="pt-5 space-y-3">
-              <Field label="Select existing supplier">
-                <PickerCombo items={suppliers} onPick={pickSupplier} placeholder="Pick supplier…" />
+              <Field label="Select Supplier / Service Provider">
+                <PickerCombo items={suppliers} onPick={pickSupplier} placeholder="Select supplier…" />
               </Field>
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Provider / hotel name" className="col-span-2"><Input value={voucher.providerName} onChange={e => patch({ providerName: e.target.value })} /></Field>
@@ -125,7 +140,7 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
                     <SelectContent>{[0,3,4,5].map(n => <SelectItem key={n} value={String(n)}>{n ? `${n} Stars` : "N/A"}</SelectItem>)}</SelectContent>
                   </Select>
                 </Field>
-                <Field label="Tel / Fax"><Input value={voucher.telFax} onChange={e => patch({ telFax: e.target.value })} /></Field>
+                <Field label="Tel / Fax (supplier DB only — not printed)"><Input value={voucher.telFax} onChange={e => patch({ telFax: e.target.value })} /></Field>
                 <Field label="Address" className="col-span-2"><Textarea rows={2} value={voucher.address} onChange={e => patch({ address: e.target.value })} /></Field>
               </div>
               <Button size="sm" variant="outline" onClick={saveSupplierToDb}>Save to supplier database</Button>
@@ -139,13 +154,22 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
               <Field label="Room type"><Input value={voucher.roomType} onChange={e => patch({ roomType: e.target.value })} /></Field>
               <Field label="Rooms"><Input type="number" min={1} value={voucher.numberOfRooms} onChange={e => patch({ numberOfRooms: Number(e.target.value) })} /></Field>
               <Field label="Adults"><Input type="number" min={1} value={voucher.adults} onChange={e => patch({ adults: Number(e.target.value) })} /></Field>
-              <Field label="Children"><Input type="number" min={0} value={voucher.children} onChange={e => patch({ children: Number(e.target.value) })} /></Field>
+              <Field label="Children"><Input type="number" min={0} value={voucher.children} onChange={e => setChildrenCount(Number(e.target.value))} /></Field>
+              {voucher.children > 0 && (
+                <div className="col-span-2 grid grid-cols-3 gap-2 rounded border border-dashed p-2">
+                  {Array.from({ length: voucher.children }).map((_, i) => (
+                    <Field key={i} label={`Child ${i + 1} age`}>
+                      <Input type="number" min={0} max={17} value={voucher.childrenAges?.[i] ?? ""} onChange={e => setChildAge(i, Number(e.target.value))} placeholder="yrs" />
+                    </Field>
+                  ))}
+                </div>
+              )}
               <Field label="Check-in"><Input type="date" value={voucher.checkIn} onChange={e => patch({ checkIn: e.target.value })} /></Field>
               <Field label="Check-out"><Input type="date" value={voucher.checkOut} onChange={e => patch({ checkOut: e.target.value })} /></Field>
-              <Field label="Rate basis" className="col-span-2">
+              <Field label="Rate basis / meal plan" className="col-span-2">
                 <Select value={voucher.rateBasis} onValueChange={(v) => patch({ rateBasis: v })}>
                   <SelectTrigger><SelectValue placeholder="Board" /></SelectTrigger>
-                  <SelectContent>{["Room Only","Bed & Breakfast","Half Board","Full Board","All Inclusive"].map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent>
+                  <SelectContent>{RATE_BASIS.map(b => <SelectItem key={b.value} value={b.value}>{b.en}</SelectItem>)}</SelectContent>
                 </Select>
               </Field>
               <Field label="Special remarks" className="col-span-2"><Textarea rows={3} value={voucher.remarks} onChange={e => patch({ remarks: e.target.value })} /></Field>
@@ -159,7 +183,13 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
               <Field label="Age requirements"><Input value={voucher.ageRequirements} onChange={e => patch({ ageRequirements: e.target.value })} /></Field>
               <Field label="Pets policy"><Input value={voucher.petsPolicy} onChange={e => patch({ petsPolicy: e.target.value })} /></Field>
               <Field label="Front desk notes"><Textarea rows={2} value={voucher.frontDeskNotes} onChange={e => patch({ frontDeskNotes: e.target.value })} /></Field>
-              <Field label="Identification requirements"><Textarea rows={2} value={voucher.identificationRequirements} onChange={e => patch({ identificationRequirements: e.target.value })} /></Field>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Checkbox id="showId" checked={voucher.showIdentification !== false} onCheckedChange={(c) => patch({ showIdentification: c === true })} />
+                  <Label htmlFor="showId" className="text-[11px] uppercase tracking-wide text-muted-foreground">Show identification requirements (on by default)</Label>
+                </div>
+                <Textarea rows={2} value={voucher.identificationRequirements} onChange={e => patch({ identificationRequirements: e.target.value })} placeholder="Leave empty to print the standard passport / national ID text." />
+              </div>
               <Field label="Children & extra bed policy"><Textarea rows={2} value={voucher.childrenExtraBedPolicy} onChange={e => patch({ childrenExtraBedPolicy: e.target.value })} /></Field>
               <Field label="Dining notes"><Textarea rows={2} value={voucher.diningNotes} onChange={e => patch({ diningNotes: e.target.value })} /></Field>
               <Field label="Final terms paragraph"><Textarea rows={3} value={voucher.finalTerms} onChange={e => patch({ finalTerms: e.target.value })} placeholder="Default text will print if empty." /></Field>
@@ -206,6 +236,7 @@ export function buildBlankVoucher(opts: { number: string }): Voucher {
     roomType: "",
     adults: 2,
     children: 0,
+    childrenAges: [],
     checkIn: "",
     checkOut: "",
     rateBasis: "Bed & Breakfast",
@@ -214,7 +245,8 @@ export function buildBlankVoucher(opts: { number: string }): Voucher {
     ageRequirements: "",
     petsPolicy: "",
     frontDeskNotes: "",
-    identificationRequirements: "Government-issued photo ID and credit card required at check-in.",
+    identificationRequirements: "",
+    showIdentification: true,
     childrenExtraBedPolicy: "",
     diningNotes: "",
     checkInOutTimes: "Check-in from 14:00 · Check-out by 12:00",

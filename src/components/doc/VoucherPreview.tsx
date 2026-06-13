@@ -1,7 +1,7 @@
 import { DocHeader, DocFooter } from "./DocChrome";
 import type { Voucher } from "@/lib/storage";
 import { formatDate, nightsBetween } from "@/lib/format";
-import { tt, type Lang } from "@/lib/i18n";
+import { tt, rateBasisLabel, type Lang } from "@/lib/i18n";
 
 function Row({ label, value }: { label: string; value?: string | number }) {
   if (!value && value !== 0) return null;
@@ -17,6 +17,21 @@ export function VoucherPreview({ voucher, lang = "en" }: { voucher: Voucher; lan
   const t = tt(lang);
   const dir = lang === "ar" ? "rtl" : "ltr";
   const nights = nightsBetween(voucher.checkIn, voucher.checkOut);
+
+  // Children ages, e.g. "4 years, 8 years".
+  const ages = (voucher.childrenAges ?? []).filter((a) => a !== null && a !== undefined && String(a) !== "");
+  const childrenAgesText =
+    voucher.children > 0 && ages.length > 0 ? ages.map((a) => `${a} ${t.years}`).join("، ") : "";
+
+  // Identification requirements default ON; uses the standard text when the
+  // field is left empty, and can be hidden via showIdentification.
+  const showId = voucher.showIdentification !== false;
+  const idText = showId ? (voucher.identificationRequirements?.trim() || t.identificationDefault) : "";
+
+  const hasPolicies =
+    voucher.checkInOutTimes || voucher.checkInRestrictions || voucher.ageRequirements || voucher.petsPolicy ||
+    voucher.frontDeskNotes || idText || voucher.childrenExtraBedPolicy || voucher.diningNotes;
+
   return (
     <div className="doc-sheet" dir={dir}>
       <DocHeader
@@ -32,14 +47,15 @@ export function VoucherPreview({ voucher, lang = "en" }: { voucher: Voucher; lan
           <Row label={t.serviceType} value={voucher.serviceType.toUpperCase()} />
           <Row label={t.serviceProvider} value={`${voucher.providerName}${voucher.hotelRating ? ` (${voucher.hotelRating}★)` : ""}`} />
           <Row label={t.address} value={voucher.address} />
-          <Row label={t.telFax} value={voucher.telFax} />
+          {/* Hotel phone (Tel/Fax) is intentionally NOT printed on the voucher. */}
           <Row label={t.serviceBookingRef} value={voucher.serviceBookingRef} />
           <Row label={t.multipleBookingRef} value={voucher.multipleBookingRef} />
           <Row label={t.confirmationNumber} value={voucher.confirmationNumber} />
           <Row label={t.guestNames} value={voucher.guestNames} />
           <Row label={t.leaderGuest} value={voucher.leaderGuest} />
           <Row label={t.roomType} value={voucher.roomType} />
-          <Row label={t.rateBasis} value={voucher.rateBasis} />
+          <Row label={t.rateBasis} value={rateBasisLabel(voucher.rateBasis, lang)} />
+          <Row label={t.childrenAges} value={childrenAgesText} />
           <Row label={t.specialRemarks} value={voucher.remarks} />
         </tbody>
       </table>
@@ -70,8 +86,7 @@ export function VoucherPreview({ voucher, lang = "en" }: { voucher: Voucher; lan
         </table>
       </div>
 
-      {(voucher.checkInOutTimes || voucher.checkInRestrictions || voucher.ageRequirements || voucher.petsPolicy ||
-        voucher.frontDeskNotes || voucher.identificationRequirements || voucher.childrenExtraBedPolicy || voucher.diningNotes) && (
+      {hasPolicies && (
         <div className="mt-4">
           <div className="doc-navy-bg px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider">{t.hotelInfoPolicies}</div>
           <table className="border border-neutral-200 border-t-0 text-[11px] w-full">
@@ -81,7 +96,7 @@ export function VoucherPreview({ voucher, lang = "en" }: { voucher: Voucher; lan
               <Row label="Age" value={voucher.ageRequirements} />
               <Row label="Pets" value={voucher.petsPolicy} />
               <Row label="Front Desk" value={voucher.frontDeskNotes} />
-              <Row label="Identification" value={voucher.identificationRequirements} />
+              <Row label={t.identificationRequirements} value={idText} />
               <Row label="Children / Extra Bed" value={voucher.childrenExtraBedPolicy} />
               <Row label="Dining" value={voucher.diningNotes} />
             </tbody>

@@ -72,6 +72,11 @@ export const T = {
     adults: "Adults",
     children: "Children",
     hotelInfoPolicies: "Hotel Information & Policies",
+    childrenAges: "Children Ages",
+    years: "years",
+    identificationRequirements: "Identification Requirements",
+    identificationDefault:
+      "Guests must present one of the following documents upon check-in: Passport, National ID card, or (for children, if required) a birth certificate.",
     voucherDefaultTerms:
       "This voucher is valid as payment only for the above-mentioned services. Any extra cost will be paid directly by the client.",
     clientAccount: "Client Account",
@@ -247,6 +252,11 @@ export const T = {
     adults: "بالغين",
     children: "أطفال",
     hotelInfoPolicies: "معلومات وسياسات الفندق",
+    childrenAges: "أعمار الأطفال",
+    years: "سنة",
+    identificationRequirements: "متطلبات إثبات الهوية",
+    identificationDefault:
+      "يجب على النزلاء تقديم أحد المستندات التالية عند تسجيل الوصول: جواز سفر، أو بطاقة الرقم القومي، أو شهادة ميلاد للأطفال عند الحاجة.",
     voucherDefaultTerms:
       "هذه القسيمة صالحة كدفع فقط للخدمات المذكورة أعلاه. أي تكلفة إضافية يتم دفعها مباشرة من قبل العميل.",
     clientAccount: "حساب العميل",
@@ -354,4 +364,20 @@ export const T = {
 
 export function tt(lang: Lang) {
   return T[lang];
+}
+
+// Hotel rate basis / meal plan options with localized labels.
+export const RATE_BASIS: { value: string; en: string; ar: string }[] = [
+  { value: "Room Only", en: "Room Only", ar: "إقامة فقط" },
+  { value: "Bed & Breakfast", en: "Bed & Breakfast", ar: "إفطار فقط" },
+  { value: "Half Board", en: "Half Board", ar: "نصف إقامة" },
+  { value: "Full Board", en: "Full Board", ar: "إقامة كاملة" },
+  { value: "All Inclusive", en: "All Inclusive", ar: "شامل كلياً" },
+  { value: "Soft All Inclusive", en: "Soft All Inclusive", ar: "سوفت أول إنكلوسيف" },
+  { value: "Ultra All Inclusive", en: "Ultra All Inclusive", ar: "ألترا أول إنكلوسيف" },
+];
+
+export function rateBasisLabel(value: string, lang: Lang): string {
+  const match = RATE_BASIS.find((r) => r.value === value);
+  return match ? (lang === "ar" ? match.ar : match.en) : value;
 }

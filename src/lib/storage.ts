@@ -258,6 +258,7 @@ export interface Voucher {
   roomType: string;
   adults: number;
   children: number;
+  childrenAges?: number[];
   checkIn: string;
   checkOut: string;
   rateBasis: string;
@@ -267,6 +268,7 @@ export interface Voucher {
   petsPolicy: string;
   frontDeskNotes: string;
   identificationRequirements: string;
+  showIdentification?: boolean;
   childrenExtraBedPolicy: string;
   diningNotes: string;
   checkInOutTimes: string;
