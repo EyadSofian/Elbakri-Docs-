@@ -5,9 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2, Edit3, Save, X } from "lucide-react";
-import { useClients, emptyClient, type Client, uid } from "@/lib/storage";
+import {
+  useClients, emptyClient, CLIENT_TYPES,
+  type Client, type ClientType, type Currency, uid,
+} from "@/lib/storage";
 import { toast } from "sonner";
+
+const CURRENCIES: Currency[] = ["USD", "EUR", "EGP", "SAR", "AED"];
 
 export const Route = createFileRoute("/clients")({
   head: () => ({ meta: [{ title: "Clients & Agencies — Elbakri Overseas" }] }),
@@ -110,13 +116,37 @@ function ClientsPage() {
                   <X className="size-4" />
                 </Button>
               </div>
-              <F label="Name">
-                <Input
-                  value={editing.name}
-                  onChange={(e) => setEditing({ ...editing, name: e.target.value })}
-                />
-              </F>
               <div className="grid grid-cols-2 gap-3">
+                <F label="Client type">
+                  <Select value={editing.type ?? "company"} onValueChange={(v) => setEditing({ ...editing, type: v as ClientType })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{CLIENT_TYPES.map((ct) => <SelectItem key={ct.value} value={ct.value}>{ct.label}</SelectItem>)}</SelectContent>
+                  </Select>
+                </F>
+                <F label="Currency">
+                  <Select value={editing.currency ?? "USD"} onValueChange={(v) => setEditing({ ...editing, currency: v as Currency })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{CURRENCIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                  </Select>
+                </F>
+                <F label="Name / agency" className="col-span-2">
+                  <Input
+                    value={editing.name}
+                    onChange={(e) => setEditing({ ...editing, name: e.target.value })}
+                  />
+                </F>
+                <F label="Contact person">
+                  <Input
+                    value={editing.contactPerson ?? ""}
+                    onChange={(e) => setEditing({ ...editing, contactPerson: e.target.value })}
+                  />
+                </F>
+                <F label="Account number">
+                  <Input
+                    value={editing.accountNumber ?? ""}
+                    onChange={(e) => setEditing({ ...editing, accountNumber: e.target.value })}
+                  />
+                </F>
                 <F label="Email">
                   <Input
                     value={editing.email}

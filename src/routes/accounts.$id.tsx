@@ -70,6 +70,7 @@ function ClientAccountView({ client }: { client: Client }) {
   const [adjustments, setAdjustments] = useAdjustments();
 
   const [currency, setCurrency] = useState<Currency>(() => {
+    if (client.currency) return client.currency;
     const first = invoices.find(i => i.clientId === id || i.client.name?.toLowerCase() === client.name.toLowerCase());
     return (first?.currency as Currency) || "USD";
   });
@@ -77,7 +78,7 @@ function ClientAccountView({ client }: { client: Client }) {
   const [periodTo, setPeriodTo] = useState<string>("");
   const [status, setStatus] = useState<DocStatus | "All">("All");
   const [preparedBy, setPreparedBy] = useState<string>("");
-  const [accountNumber, setAccountNumber] = useState<string>(client.id.slice(0, 8).toUpperCase());
+  const [accountNumber, setAccountNumber] = useState<string>(client.accountNumber || client.id.slice(0, 8).toUpperCase());
 
   const account = useMemo(
     () => computeClientAccount({ client, invoices, payments, creditNotes, debitNotes, refunds, adjustments, currency }),
@@ -169,7 +170,13 @@ function ClientAccountView({ client }: { client: Client }) {
         <header>
           <h1 className="text-2xl font-bold doc-navy">{client.name}</h1>
           <div className="text-xs text-muted-foreground">
-            {[client.email, client.phone, client.taxId && `Tax ${client.taxId}`].filter(Boolean).join(" · ")}
+            {[
+              client.type === "individual" ? "Individual" : "Company / B2B",
+              client.contactPerson,
+              client.email,
+              client.phone,
+              client.taxId && `Tax ${client.taxId}`,
+            ].filter(Boolean).join(" · ")}
           </div>
         </header>
 

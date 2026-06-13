@@ -44,6 +44,30 @@ export const SERVICE_TYPES: { value: ServiceType; label: string }[] = [
   { value: "other", label: "Other Service" },
 ];
 
+export type ClientType = "individual" | "company";
+export const CLIENT_TYPES: { value: ClientType; label: string; labelAr: string }[] = [
+  { value: "company", label: "Company / B2B", labelAr: "شركة / B2B" },
+  { value: "individual", label: "Individual", labelAr: "عميل فردي" },
+];
+
+export type SupplierType =
+  | "hotel"
+  | "transport"
+  | "tour_operator"
+  | "activity"
+  | "visa_office"
+  | "flight"
+  | "other";
+export const SUPPLIER_TYPES: { value: SupplierType; label: string }[] = [
+  { value: "hotel", label: "Hotel" },
+  { value: "transport", label: "Transport Company" },
+  { value: "tour_operator", label: "Tour Operator" },
+  { value: "activity", label: "Activity Provider" },
+  { value: "visa_office", label: "Visa Office" },
+  { value: "flight", label: "Flight Supplier" },
+  { value: "other", label: "Other" },
+];
+
 export interface ServiceItem {
   id: string;
   type: ServiceType;
@@ -63,9 +87,13 @@ export interface ServiceItem {
 
 export interface Client {
   id: string;
+  type?: ClientType;
   name: string;
+  contactPerson?: string;
   address: string;
   taxId: string;
+  accountNumber?: string;
+  currency?: Currency;
   email: string;
   phone: string;
   notes: string;
@@ -76,6 +104,7 @@ export interface Client {
 
 export interface Supplier {
   id: string;
+  type?: SupplierType;
   name: string;
   address: string;
   phone: string;
@@ -599,15 +628,19 @@ export const nextAdjustmentNumberAsync = () => nextNumber("adjustment", nextAdju
 
 export const emptyClient = (): Client => ({
   id: uid(),
+  type: "company",
   name: "",
+  contactPerson: "",
   address: "",
   taxId: "",
+  accountNumber: "",
   email: "",
   phone: "",
   notes: "",
 });
 export const emptySupplier = (): Supplier => ({
   id: uid(),
+  type: "other",
   name: "",
   address: "",
   phone: "",

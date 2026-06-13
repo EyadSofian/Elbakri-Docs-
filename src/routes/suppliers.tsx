@@ -5,9 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2, Edit3, Save, X } from "lucide-react";
-import { useSuppliers, emptySupplier, type Supplier } from "@/lib/storage";
+import { useSuppliers, emptySupplier, SUPPLIER_TYPES, type Supplier, type SupplierType } from "@/lib/storage";
 import { toast } from "sonner";
+
+const supplierTypeLabel = (t?: SupplierType) => SUPPLIER_TYPES.find((s) => s.value === t)?.label ?? "";
 
 export const Route = createFileRoute("/suppliers")({
   head: () => ({ meta: [{ title: "Suppliers — Elbakri Overseas" }] }),
@@ -50,7 +53,10 @@ function SuppliersPage() {
           {filtered.map(c => (
             <div key={c.id} className="flex items-start justify-between gap-3 px-4 py-3 hover:bg-muted/50">
               <div className="min-w-0 flex-1">
-                <div className="font-semibold doc-navy">{c.name}</div>
+                <div className="font-semibold doc-navy">
+                  {c.name}
+                  {c.type && <span className="ml-2 text-[10px] font-normal uppercase tracking-wide text-muted-foreground">{supplierTypeLabel(c.type)}</span>}
+                </div>
                 <div className="text-xs text-muted-foreground">{c.email} · {c.phone}</div>
                 {c.address && <div className="text-xs text-muted-foreground truncate">{c.address}</div>}
               </div>
@@ -66,8 +72,14 @@ function SuppliersPage() {
               <div className="font-semibold">{list.some(c => c.id === editing.id) ? "Edit" : "New"} supplier</div>
               <Button variant="ghost" size="icon" onClick={() => setEditing(null)}><X className="size-4" /></Button>
             </div>
-            <F label="Name"><Input value={editing.name} onChange={e => setEditing({ ...editing, name: e.target.value })} /></F>
             <div className="grid grid-cols-2 gap-3">
+              <F label="Supplier name"><Input value={editing.name} onChange={e => setEditing({ ...editing, name: e.target.value })} /></F>
+              <F label="Supplier type">
+                <Select value={editing.type ?? "other"} onValueChange={(v) => setEditing({ ...editing, type: v as SupplierType })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{SUPPLIER_TYPES.map((st) => <SelectItem key={st.value} value={st.value}>{st.label}</SelectItem>)}</SelectContent>
+                </Select>
+              </F>
               <F label="Phone"><Input value={editing.phone} onChange={e => setEditing({ ...editing, phone: e.target.value })} /></F>
               <F label="Email"><Input value={editing.email} onChange={e => setEditing({ ...editing, email: e.target.value })} /></F>
               <F label="Address" className="col-span-2"><Textarea rows={2} value={editing.address} onChange={e => setEditing({ ...editing, address: e.target.value })} /></F>

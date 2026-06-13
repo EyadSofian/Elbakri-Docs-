@@ -52,6 +52,7 @@ function ConsolidatedView({ client }: { client: Client }) {
   const [adjustments] = useAdjustments();
 
   const [currency, setCurrency] = useState<Currency>(() => {
+    if (client.currency) return client.currency;
     const first = invoices.find(i => i.clientId === id);
     return (first?.currency as Currency) || "USD";
   });
@@ -66,7 +67,7 @@ function ConsolidatedView({ client }: { client: Client }) {
   const [manualSelect, setManualSelect] = useState(false);
   const [lang, setLang] = useState<Lang>("en");
   const [preparedBy, setPreparedBy] = useState("");
-  const [accountNumber, setAccountNumber] = useState(client.id.slice(0, 8).toUpperCase());
+  const [accountNumber, setAccountNumber] = useState(client.accountNumber || client.id.slice(0, 8).toUpperCase());
   const [dueDate, setDueDate] = useState("");
 
   const account = useMemo(
