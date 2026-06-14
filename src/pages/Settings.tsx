@@ -16,7 +16,7 @@ import { useSettings, type CompanySettings, type Currency } from "@/lib/storage"
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/lib/use-document-title";
 
-const logoUrl = "/elbakri-logo.svg";
+const logoUrl = "/elbakri-logo.png";
 
 export default function SettingsPage() {
   useDocumentTitle("Company Settings — Elbakri Overseas");

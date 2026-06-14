@@ -25,7 +25,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 
-const logoUrl = "/elbakri-logo.svg";
+const logoUrl = "/elbakri-logo.png";
 
 const groups = [
   {

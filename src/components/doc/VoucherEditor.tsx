@@ -14,13 +14,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Save, Download, Printer, Trash2, Copy } from "lucide-react";
+import { Save, Download, Printer, Trash2, Copy, Plus } from "lucide-react";
 import { toast } from "sonner";
 import {
   SERVICE_TYPES,
+  emptyServiceItem,
   useVouchers,
   useSuppliers,
   uid,
+  type ServiceItem,
+  type ServiceType,
   type Voucher,
   type Supplier,
 } from "@/lib/storage";
@@ -29,6 +32,7 @@ import { PickerCombo } from "@/components/doc/PickerCombo";
 import { exportElementToPdf, printElement, sanitizeFilenamePart } from "@/lib/pdf";
 import { LanguageToggle } from "@/components/doc/LanguageToggle";
 import { RATE_BASIS, type Lang } from "@/lib/i18n";
+import { ServiceDynamicFields } from "@/components/doc/ServiceFields";
 
 function Field({
   label,
@@ -47,8 +51,174 @@ function Field({
   );
 }
 
+function legacyVoucherService(voucher: Voucher): ServiceItem {
+  return {
+    ...emptyServiceItem(voucher.serviceType || "hotel"),
+    description: voucher.remarks || "",
+    passengerName: voucher.leaderGuest || voucher.guestNames || "",
+    bookingRef: voucher.serviceBookingRef || "",
+    supplierRef: voucher.confirmationNumber || voucher.multipleBookingRef || "",
+    startDate: voucher.checkIn || "",
+    endDate: voucher.checkOut || "",
+    notes: voucher.remarks || "",
+    meta: {
+      hotelName: voucher.providerName || "",
+      rating: voucher.hotelRating || 0,
+      address: voucher.address || "",
+      roomType: voucher.roomType || "",
+      rooms: voucher.numberOfRooms || 1,
+      adults: voucher.adults || 2,
+      children: voucher.children || 0,
+      checkIn: voucher.checkIn || "",
+      checkOut: voucher.checkOut || "",
+      board: voucher.rateBasis || "",
+    },
+  };
+}
+
+function ensureVoucherServices(voucher: Voucher): Voucher {
+  return voucher.items?.length ? voucher : { ...voucher, items: [legacyVoucherService(voucher)] };
+}
+
+function primaryServicePatch(item: ServiceItem, current: Voucher): Partial<Voucher> {
+  const meta = item.meta || {};
+  const patch: Partial<Voucher> = {
+    serviceType: item.type,
+    serviceBookingRef: item.bookingRef || current.serviceBookingRef,
+    confirmationNumber: item.supplierRef || current.confirmationNumber,
+    remarks: item.notes || item.description || current.remarks,
+  };
+
+  if (item.passengerName) {
+    patch.leaderGuest = item.passengerName;
+  }
+
+  if (item.type === "hotel") {
+    patch.providerName = meta.hotelName || current.providerName;
+    patch.hotelRating = Number(meta.rating || current.hotelRating || 0);
+    patch.address = meta.address || current.address;
+    patch.roomType = meta.roomType || current.roomType;
+    patch.numberOfRooms = Number(meta.rooms || current.numberOfRooms || 1);
+    patch.adults = Number(meta.adults || current.adults || 2);
+    patch.children = Number(meta.children || current.children || 0);
+    patch.checkIn = meta.checkIn || current.checkIn;
+    patch.checkOut = meta.checkOut || current.checkOut;
+    patch.rateBasis = meta.board || current.rateBasis;
+  }
+
+  return patch;
+}
+
+function VoucherServiceItemForm({
+  item,
+  index,
+  canRemove,
+  onChange,
+  onRemove,
+  onDuplicate,
+}: {
+  item: ServiceItem;
+  index: number;
+  canRemove: boolean;
+  onChange: (next: ServiceItem) => void;
+  onRemove: () => void;
+  onDuplicate: () => void;
+}) {
+  const patch = (p: Partial<ServiceItem>) => onChange({ ...item, ...p });
+  const metaPatch = (mp: Record<string, any>) =>
+    onChange({ ...item, meta: { ...(item.meta || {}), ...mp } });
+
+  return (
+    <Card className="border-l-4 border-l-navy">
+      <CardContent className="pt-5 space-y-4">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="size-7 inline-flex items-center justify-center rounded-full bg-navy text-navy-foreground text-xs font-semibold">
+              {index + 1}
+            </span>
+            <span className="text-sm font-semibold">Voucher service</span>
+          </div>
+          <div className="flex gap-1">
+            <Button type="button" variant="outline" size="sm" onClick={onDuplicate}>
+              <Copy className="size-3.5" />
+              Duplicate
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={onRemove}
+              disabled={!canRemove}
+              className="text-destructive hover:text-destructive"
+            >
+              <Trash2 className="size-3.5" />
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Field label="Service type" className="col-span-2">
+            <Select
+              value={item.type}
+              onValueChange={(value) =>
+                patch({ type: value as ServiceType, meta: {}, unit: "", unitPrice: 0, total: 0 })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SERVICE_TYPES.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="Description" className="col-span-2">
+            <Input
+              value={item.description}
+              onChange={(e) => patch({ description: e.target.value })}
+              placeholder="Short service description"
+            />
+          </Field>
+          <Field label="Passenger / guest" className="col-span-2">
+            <Input
+              value={item.passengerName}
+              onChange={(e) => patch({ passengerName: e.target.value })}
+            />
+          </Field>
+          <Field label="Booking ref">
+            <Input
+              value={item.bookingRef}
+              onChange={(e) => patch({ bookingRef: e.target.value })}
+            />
+          </Field>
+          <Field label="Supplier ref">
+            <Input
+              value={item.supplierRef}
+              onChange={(e) => patch({ supplierRef: e.target.value })}
+            />
+          </Field>
+        </div>
+
+        <ServiceDynamicFields item={item} onChange={patch} onMeta={metaPatch} />
+
+        <Field label="Service notes">
+          <Textarea
+            rows={2}
+            value={item.notes}
+            onChange={(e) => patch({ notes: e.target.value })}
+          />
+        </Field>
+      </CardContent>
+    </Card>
+  );
+}
+
 export function VoucherEditor({ initial }: { initial: Voucher }) {
-  const [voucher, setVoucher] = useState<Voucher>(initial);
+  const [voucher, setVoucher] = useState<Voucher>(() => ensureVoucherServices(initial));
   const [vouchers, setVouchers] = useVouchers();
   const [suppliers, setSuppliers] = useSuppliers();
   const [lang, setLang] = useState<Lang>("en");
@@ -56,6 +226,29 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
   const nav = useNavigate();
 
   const patch = (p: Partial<Voucher>) => setVoucher((v) => ({ ...v, ...p }));
+  const serviceItems = voucher.items ?? [];
+
+  const setServiceItems = (items: ServiceItem[]) => {
+    setVoucher((current) => {
+      const safeItems = items.length ? items : [emptyServiceItem("hotel")];
+      return {
+        ...current,
+        items: safeItems,
+        ...primaryServicePatch(safeItems[0], current),
+      };
+    });
+  };
+  const addService = () => setServiceItems([...serviceItems, emptyServiceItem("hotel")]);
+  const updateService = (index: number, item: ServiceItem) =>
+    setServiceItems(serviceItems.map((current, i) => (i === index ? item : current)));
+  const removeService = (index: number) =>
+    setServiceItems(serviceItems.filter((_, i) => i !== index));
+  const duplicateService = (index: number) => {
+    const item = serviceItems[index];
+    if (!item) return;
+    const copy = { ...item, id: uid(), meta: { ...(item.meta || {}) } };
+    setServiceItems([...serviceItems.slice(0, index + 1), copy, ...serviceItems.slice(index + 1)]);
+  };
 
   // Children ages: keep the array length in sync with the children count.
   const setChildrenCount = (n: number) => {
@@ -70,11 +263,13 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
   };
 
   const save = () => {
+    const nextVoucher = ensureVoucherServices(voucher);
+    setVoucher(nextVoucher);
     setVouchers((prev) => {
-      const ix = prev.findIndex((p) => p.id === voucher.id);
-      if (ix === -1) return [voucher, ...prev];
+      const ix = prev.findIndex((p) => p.id === nextVoucher.id);
+      if (ix === -1) return [nextVoucher, ...prev];
       const next = [...prev];
-      next[ix] = voucher;
+      next[ix] = nextVoucher;
       return next;
     });
     toast.success("Voucher saved");
@@ -85,10 +280,12 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
     nav("/documents");
   };
   const duplicate = () => {
+    const source = ensureVoucherServices(voucher);
     const dup = {
-      ...voucher,
+      ...source,
       id: uid(),
-      number: voucher.number + "-COPY",
+      items: source.items?.map((item) => ({ ...item, id: uid(), meta: { ...(item.meta || {}) } })),
+      number: source.number + "-COPY",
       createdAt: new Date().toISOString(),
     };
     setVouchers((prev) => [dup, ...prev]);
@@ -151,8 +348,9 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
         </div>
 
         <Tabs defaultValue="details">
-          <TabsList className="grid grid-cols-4 w-full">
+          <TabsList className="grid grid-cols-5 w-full">
             <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="services">Services</TabsTrigger>
             <TabsTrigger value="provider">Provider</TabsTrigger>
             <TabsTrigger value="guests">Guests</TabsTrigger>
             <TabsTrigger value="policies">Policies</TabsTrigger>
@@ -177,7 +375,13 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
                 <Field label="Service type">
                   <Select
                     value={voucher.serviceType}
-                    onValueChange={(v) => patch({ serviceType: v as any })}
+                    onValueChange={(value) => {
+                      const nextType = value as ServiceType;
+                      const [first, ...rest] = serviceItems.length
+                        ? serviceItems
+                        : [legacyVoucherService(voucher)];
+                      setServiceItems([{ ...first, type: nextType, meta: {} }, ...rest]);
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -211,6 +415,26 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
                 </Field>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="services" className="space-y-3">
+            <div className="space-y-3">
+              {serviceItems.map((item, index) => (
+                <VoucherServiceItemForm
+                  key={item.id}
+                  item={item}
+                  index={index}
+                  canRemove={serviceItems.length > 1}
+                  onChange={(next) => updateService(index, next)}
+                  onRemove={() => removeService(index)}
+                  onDuplicate={() => duplicateService(index)}
+                />
+              ))}
+              <Button type="button" variant="outline" onClick={addService} className="w-full">
+                <Plus className="size-4" />
+                Add another service
+              </Button>
+            </div>
           </TabsContent>
 
           <TabsContent value="provider">
@@ -489,6 +713,7 @@ export function buildBlankVoucher(opts: { number: string }): Voucher {
     number: opts.number,
     date: new Date().toISOString().slice(0, 10),
     serviceType: "hotel",
+    items: [emptyServiceItem("hotel")],
     providerName: "",
     hotelRating: 0,
     address: "",

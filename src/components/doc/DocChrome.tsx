@@ -2,7 +2,7 @@ import { getSettings } from "@/lib/storage";
 import type { CompanySettings } from "@/lib/storage";
 import { tt, type Lang } from "@/lib/i18n";
 
-const logoUrl = "/elbakri-logo.svg";
+const logoUrl = "/elbakri-logo.png";
 
 export function DocHeader({
   title,

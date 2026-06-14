@@ -273,6 +273,7 @@ export interface Voucher {
   kind: "voucher";
   number: string;
   date: string;
+  items?: ServiceItem[];
   serviceType: ServiceType;
   providerName: string;
   hotelRating: number;
