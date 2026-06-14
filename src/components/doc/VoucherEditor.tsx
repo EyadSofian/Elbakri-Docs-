@@ -327,7 +327,7 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
 
   return (
     <div className="flex flex-col xl:flex-row min-h-[calc(100vh-3.5rem)]">
-      <section className="xl:w-[640px] xl:border-r p-4 space-y-3 overflow-y-auto">
+      <section className="editor-pane xl:w-[640px] xl:border-r p-4 space-y-3 overflow-y-auto">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h1 className="text-xl font-bold">
             {vouchers.some((v) => v.id === voucher.id) ? "Edit" : "New"} Voucher
@@ -679,8 +679,8 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
         </Tabs>
       </section>
 
-      <section className="flex-1 bg-muted/30 overflow-y-auto">
-        <div className="sticky top-0 z-10 bg-background/90 backdrop-blur border-b px-4 py-2 flex items-center justify-between print:hidden">
+      <section className="doc-preview-pane flex-1 bg-muted/30 overflow-y-auto">
+        <div className="doc-preview-toolbar sticky top-0 z-10 bg-background/90 backdrop-blur border-b px-4 py-2 flex items-center justify-between print:hidden">
           <div className="flex items-center gap-3">
             <div className="text-sm font-medium">Live preview</div>
             <LanguageToggle lang={lang} onChange={setLang} />
@@ -696,9 +696,11 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
             </Button>
           </div>
         </div>
-        <div className="p-6 flex justify-center">
-          <div ref={previewRef}>
-            <VoucherPreview voucher={voucher} lang={lang} />
+        <div className="doc-preview-scroll">
+          <div className="doc-preview-inner p-6 flex justify-center">
+            <div ref={previewRef}>
+              <VoucherPreview voucher={voucher} lang={lang} />
+            </div>
           </div>
         </div>
       </section>

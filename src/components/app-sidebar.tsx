@@ -23,6 +23,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarFooter,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 const logoUrl = "/elbakri-logo.png";
@@ -64,8 +65,12 @@ const groups = [
 
 export function AppSidebar() {
   const { pathname } = useLocation();
+  const { isMobile, setOpenMobile } = useSidebar();
   const isActive = (url: string) =>
     url === "/" ? pathname === "/" : pathname === url || pathname.startsWith(url + "/");
+  const closeMobileSidebar = () => {
+    if (isMobile) setOpenMobile(false);
+  };
 
   return (
     <Sidebar collapsible="icon">
@@ -94,7 +99,7 @@ export function AppSidebar() {
                 {g.items.map((item) => (
                   <SidebarMenuItem key={item.url}>
                     <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
-                      <Link to={item.url}>
+                      <Link to={item.url} onClick={closeMobileSidebar}>
                         <item.icon className="size-4" />
                         <span>{item.title}</span>
                       </Link>

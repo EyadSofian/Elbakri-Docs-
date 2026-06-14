@@ -125,7 +125,7 @@ function ConsolidatedView({ client }: { client: Client }) {
 
   return (
     <div className="flex flex-col xl:flex-row min-h-[calc(100vh-3.5rem)]">
-      <aside className="xl:w-[380px] xl:border-r p-4 space-y-3 overflow-y-auto print:hidden">
+      <aside className="editor-pane xl:w-[380px] xl:border-r p-4 space-y-3 overflow-y-auto print:hidden">
         <Link
           to={`/accounts/${id}`}
           className="text-xs text-muted-foreground inline-flex items-center gap-1 hover:underline"
@@ -238,18 +238,22 @@ function ConsolidatedView({ client }: { client: Client }) {
         </div>
       </aside>
 
-      <section className="flex-1 bg-muted/30 overflow-y-auto p-6 flex justify-center">
-        <div ref={docRef}>
-          <ConsolidatedClientInvoicePreview
-            client={client}
-            account={account}
-            filters={filters}
-            number={`CONS-${accountNumber}-${new Date().toISOString().slice(0, 10)}`}
-            lang={lang}
-            preparedBy={preparedBy}
-            accountNumber={accountNumber}
-            dueDate={dueDate}
-          />
+      <section className="doc-preview-pane flex-1 bg-muted/30 overflow-y-auto">
+        <div className="doc-preview-scroll">
+          <div className="doc-preview-inner p-6 flex justify-center">
+            <div ref={docRef}>
+              <ConsolidatedClientInvoicePreview
+                client={client}
+                account={account}
+                filters={filters}
+                number={`CONS-${accountNumber}-${new Date().toISOString().slice(0, 10)}`}
+                lang={lang}
+                preparedBy={preparedBy}
+                accountNumber={accountNumber}
+                dueDate={dueDate}
+              />
+            </div>
+          </div>
         </div>
       </section>
     </div>

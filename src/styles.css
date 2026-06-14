@@ -112,7 +112,7 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
   }
 }
 
@@ -247,6 +247,142 @@
   background: white;
   z-index: -1;
   pointer-events: none;
+}
+
+/* ===== Responsive app surface ===== */
+.app-main {
+  overflow-x: hidden;
+}
+
+.doc-preview-scroll {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+}
+
+.doc-preview-inner {
+  min-width: max-content;
+}
+
+@media screen and (max-width: 767px) {
+  .app-main > .p-6 {
+    padding: 1rem;
+  }
+
+  .app-main > .p-6 > header {
+    align-items: flex-start;
+  }
+
+  .app-main > .p-6 > header > .flex {
+    width: 100%;
+  }
+
+  .app-main > .p-6 > header > .flex > a,
+  .app-main > .p-6 > header > .flex > button {
+    flex: 1 1 9rem;
+  }
+
+  .mobile-action-row {
+    width: 100%;
+  }
+
+  .mobile-action-row > a,
+  .mobile-action-row > button {
+    flex: 1 1 9rem;
+  }
+
+  .document-row {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .document-row > .min-w-0 {
+    flex-basis: 100%;
+  }
+
+  .app-main > .p-6 .grid.grid-cols-2,
+  .app-main > .p-6 .grid.grid-cols-3,
+  .app-main > .p-6 .grid.grid-cols-4 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .app-main > .p-6 .col-span-2,
+  .app-main > .p-6 .col-span-3,
+  .app-main > .p-6 .col-span-4 {
+    grid-column: span 1 / span 1;
+  }
+
+  .editor-pane {
+    width: 100%;
+    padding: 0.875rem;
+  }
+
+  .editor-pane .grid.grid-cols-2,
+  .editor-pane .grid.grid-cols-3,
+  .editor-pane .grid.grid-cols-4,
+  .editor-pane .grid.grid-cols-5,
+  .editor-pane .grid.grid-cols-6 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editor-pane .col-span-2,
+  .editor-pane .col-span-3,
+  .editor-pane .col-span-4,
+  .editor-pane .col-span-5,
+  .editor-pane .col-span-6 {
+    grid-column: span 1 / span 1;
+  }
+
+  .app-main [role="tablist"] {
+    display: flex !important;
+    min-height: 2.75rem;
+    height: auto;
+    max-width: 100%;
+    justify-content: flex-start !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+  }
+
+  .app-main [role="tablist"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  .app-main [role="tab"] {
+    min-height: 2.25rem;
+    min-width: max-content;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+
+  .doc-preview-pane {
+    min-height: auto;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .doc-preview-toolbar {
+    align-items: flex-start;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .doc-preview-toolbar > .flex {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .doc-preview-toolbar button {
+    flex: 1 1 8rem;
+  }
+
+  .doc-preview-inner {
+    justify-content: flex-start;
+    padding: 0.75rem;
+  }
+
+  .doc-sheet {
+    margin: 0;
+  }
 }
 
 @media print {

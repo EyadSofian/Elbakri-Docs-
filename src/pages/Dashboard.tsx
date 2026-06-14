@@ -35,7 +35,7 @@ export default function Dashboard() {
             Internal document studio · Elbakri Overseas · Est. 1982
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="mobile-action-row flex flex-wrap gap-2">
           <Button asChild className="bg-navy text-navy-foreground hover:bg-navy/90">
             <Link to="/invoices/new">
               <Plus />
@@ -57,7 +57,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           icon={<FileText />}
           label="Invoices"

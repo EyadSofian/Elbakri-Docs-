@@ -53,7 +53,7 @@ export default function DocumentsPage() {
             Search by number, client, guest, booking ref, status or date.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="mobile-action-row flex gap-2">
           <Button asChild variant="outline">
             <Link to="/invoices/new">New invoice</Link>
           </Button>
@@ -101,7 +101,7 @@ export default function DocumentsPage() {
                   <Link
                     key={i.id}
                     to={`/invoices/${i.id}`}
-                    className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-muted transition"
+                    className="document-row flex items-center justify-between gap-3 px-4 py-3 hover:bg-muted transition"
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
@@ -151,7 +151,7 @@ export default function DocumentsPage() {
                 <Link
                   key={v.id}
                   to={`/vouchers/${v.id}`}
-                  className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-muted transition"
+                  className="document-row flex items-center justify-between gap-3 px-4 py-3 hover:bg-muted transition"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="font-semibold doc-navy">{v.number}</div>
@@ -191,7 +191,7 @@ export default function DocumentsPage() {
                 <Link
                   key={s.id}
                   to={`/statements/${s.id}`}
-                  className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-muted transition"
+                  className="document-row flex items-center justify-between gap-3 px-4 py-3 hover:bg-muted transition"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="font-semibold doc-navy">

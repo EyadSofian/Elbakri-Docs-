@@ -60,7 +60,7 @@ export default function BalanceDuePage() {
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-3.5rem)]">
-      <div className="sticky top-0 z-10 bg-background/90 backdrop-blur border-b px-4 py-2 flex items-center justify-between print:hidden">
+      <div className="doc-preview-toolbar sticky top-0 z-10 bg-background/90 backdrop-blur border-b px-4 py-2 flex items-center justify-between print:hidden">
         <div className="flex items-center gap-3">
           <Link
             to={`/invoices/${invoice.id}`}
@@ -82,14 +82,18 @@ export default function BalanceDuePage() {
           </Button>
         </div>
       </div>
-      <div className="p-6 flex justify-center bg-muted/30 flex-1 overflow-y-auto">
-        <div ref={previewRef}>
-          <BalanceDueInvoicePreview
-            invoice={invoice}
-            payments={clientPayments}
-            creditNotes={clientCreditNotes}
-            lang={lang}
-          />
+      <div className="doc-preview-pane bg-muted/30 flex-1 overflow-y-auto">
+        <div className="doc-preview-scroll">
+          <div className="doc-preview-inner p-6 flex justify-center">
+            <div ref={previewRef}>
+              <BalanceDueInvoicePreview
+                invoice={invoice}
+                payments={clientPayments}
+                creditNotes={clientCreditNotes}
+                lang={lang}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>

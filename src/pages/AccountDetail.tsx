@@ -215,7 +215,7 @@ function ClientAccountView({ client }: { client: Client }) {
 
   return (
     <div className="flex flex-col xl:flex-row min-h-[calc(100vh-3.5rem)]">
-      <section className="xl:w-[680px] xl:border-r p-4 space-y-4 overflow-y-auto">
+      <section className="editor-pane xl:w-[680px] xl:border-r p-4 space-y-4 overflow-y-auto">
         <div className="flex items-center justify-between gap-2">
           <Link
             to="/accounts"
@@ -782,9 +782,9 @@ function ClientAccountView({ client }: { client: Client }) {
         </Tabs>
       </section>
 
-      <section className="flex-1 bg-muted/30 overflow-y-auto">
+      <section className="doc-preview-pane flex-1 bg-muted/30 overflow-y-auto">
         <Tabs defaultValue="consolidated">
-          <div className="sticky top-0 z-10 bg-background/90 backdrop-blur border-b px-4 py-2 flex items-center justify-between print:hidden flex-wrap gap-2">
+          <div className="doc-preview-toolbar sticky top-0 z-10 bg-background/90 backdrop-blur border-b px-4 py-2 flex items-center justify-between print:hidden flex-wrap gap-2">
             <div className="flex items-center gap-3">
               <TabsList>
                 <TabsTrigger value="consolidated">
@@ -824,33 +824,35 @@ function ClientAccountView({ client }: { client: Client }) {
               </Button>
             </div>
           </div>
-          <div className="p-6 flex justify-center">
-            <TabsContent value="consolidated">
-              <div ref={consolidatedRef}>
-                <ConsolidatedInvoicePreview
-                  client={client}
-                  account={account}
-                  periodFrom={periodFrom}
-                  periodTo={periodTo}
-                  number={`CONS-${accountNumber}-${new Date().toISOString().slice(0, 10)}`}
-                  lang={lang}
-                />
-              </div>
-            </TabsContent>
-            <TabsContent value="statement">
-              <div ref={statementRef}>
-                <ClientAccountStatementPreview
-                  client={client}
-                  account={account}
-                  periodFrom={periodFrom}
-                  periodTo={periodTo}
-                  openingBalance={account.totals.openingBalance}
-                  preparedBy={preparedBy}
-                  accountNumber={accountNumber}
-                  lang={lang}
-                />
-              </div>
-            </TabsContent>
+          <div className="doc-preview-scroll">
+            <div className="doc-preview-inner p-6 flex justify-center">
+              <TabsContent value="consolidated">
+                <div ref={consolidatedRef}>
+                  <ConsolidatedInvoicePreview
+                    client={client}
+                    account={account}
+                    periodFrom={periodFrom}
+                    periodTo={periodTo}
+                    number={`CONS-${accountNumber}-${new Date().toISOString().slice(0, 10)}`}
+                    lang={lang}
+                  />
+                </div>
+              </TabsContent>
+              <TabsContent value="statement">
+                <div ref={statementRef}>
+                  <ClientAccountStatementPreview
+                    client={client}
+                    account={account}
+                    periodFrom={periodFrom}
+                    periodTo={periodTo}
+                    openingBalance={account.totals.openingBalance}
+                    preparedBy={preparedBy}
+                    accountNumber={accountNumber}
+                    lang={lang}
+                  />
+                </div>
+              </TabsContent>
+            </div>
           </div>
         </Tabs>
       </section>
