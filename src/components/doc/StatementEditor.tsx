@@ -12,10 +12,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Save, Download, Printer, Plus, Trash2, Copy } from "lucide-react";
+import { Save, Download, Printer, Plus, Trash2, Copy, UserPlus } from "lucide-react";
 import { toast } from "sonner";
-import { uid, useStatements, type Statement, type StatementTxn } from "@/lib/storage";
+import {
+  uid,
+  useStatements,
+  useClients,
+  type Client,
+  type Currency,
+  type Statement,
+  type StatementTxn,
+} from "@/lib/storage";
 import { StatementPreview } from "@/components/doc/StatementPreview";
+import { PickerCombo } from "@/components/doc/PickerCombo";
 import { exportElementToPdf, printElement, sanitizeFilenamePart } from "@/lib/pdf";
 import { LanguageToggle } from "@/components/doc/LanguageToggle";
 import type { Lang } from "@/lib/i18n";
@@ -40,20 +49,25 @@ function Field({
 export function StatementEditor({ initial }: { initial: Statement }) {
   const [st, setSt] = useState<Statement>(initial);
   const [statements, setStatements] = useStatements();
+  const [clients, setClients] = useClients();
   const [lang, setLang] = useState<Lang>("en");
   const ref = useRef<HTMLDivElement>(null);
   const nav = useNavigate();
   const patch = (p: Partial<Statement>) => setSt((s) => ({ ...s, ...p }));
 
-  const save = () => {
-    setStatements((prev) => {
+  const save = async () => {
+    const savedToDatabase = await setStatements((prev) => {
       const ix = prev.findIndex((p) => p.id === st.id);
       if (ix === -1) return [st, ...prev];
       const next = [...prev];
       next[ix] = st;
       return next;
     });
-    toast.success("Statement saved");
+    if (savedToDatabase) {
+      toast.success("Statement saved to database");
+    } else {
+      toast.error("Saved on this browser only. Server database is not connected.");
+    }
   };
   const remove = () => {
     if (!confirm("Delete this statement?")) return;
@@ -66,13 +80,82 @@ export function StatementEditor({ initial }: { initial: Statement }) {
     nav(`/statements/${dup.id}`);
   };
   const download = async () => {
-    save();
+    await save();
     if (!ref.current) return;
     const name = `ELBAKRI-SOA-${sanitizeFilenamePart(st.customerName || st.accountName)}-${sanitizeFilenamePart(`${st.periodFrom}_${st.periodTo}`)}`;
     await exportElementToPdf(ref.current, name, "landscape");
   };
   const doPrint = () => {
     if (ref.current) printElement(ref.current);
+  };
+
+  const pickClient = (client: Client | null) => {
+    if (!client) {
+      patch({ clientId: undefined });
+      return;
+    }
+    patch({
+      clientId: client.id,
+      customerName: client.name,
+      accountName: client.name,
+      accountNumber: client.accountNumber || st.accountNumber,
+      currency: client.currency || st.currency,
+      openingBalance: client.openingBalance ?? st.openingBalance,
+    });
+  };
+
+  const saveClientAccount = async () => {
+    const name = st.customerName.trim() || st.accountName.trim();
+    if (!name) {
+      toast.error("Customer or account name required");
+      return;
+    }
+
+    const existing = clients.find((client) => client.name.toLowerCase() === name.toLowerCase());
+    const clientId = existing?.id || uid();
+    const client: Client = existing
+      ? {
+          ...existing,
+          name,
+          accountNumber: st.accountNumber,
+          currency: st.currency,
+          openingBalance: st.openingBalance,
+          openingBalanceDate: st.periodFrom,
+          openingBalanceCurrency: st.currency,
+        }
+      : {
+          id: clientId,
+          type: "company",
+          name,
+          contactPerson: "",
+          address: "",
+          taxId: "",
+          accountNumber: st.accountNumber,
+          currency: st.currency,
+          email: "",
+          phone: "",
+          notes: "",
+          openingBalance: st.openingBalance,
+          openingBalanceDate: st.periodFrom,
+          openingBalanceCurrency: st.currency,
+        };
+
+    const savedToDatabase = await setClients((prev) =>
+      existing
+        ? prev.map((current) => (current.id === existing.id ? client : current))
+        : [client, ...prev],
+    );
+    patch({
+      clientId,
+      customerName: name,
+      accountName: st.accountName.trim() || name,
+    });
+
+    if (savedToDatabase) {
+      toast.success(existing ? "Client account updated" : "Client account saved");
+    } else {
+      toast.error("Account saved on this browser only. Server database is not connected.");
+    }
   };
 
   const addTxn = () =>
@@ -121,6 +204,14 @@ export function StatementEditor({ initial }: { initial: Statement }) {
 
         <Card>
           <CardContent className="pt-5 grid grid-cols-2 gap-3">
+            <Field label="Saved client account" className="col-span-2">
+              <PickerCombo
+                items={clients}
+                value={st.clientId}
+                onPick={pickClient}
+                placeholder="Select a saved client…"
+              />
+            </Field>
             <Field label="Customer / agency" className="col-span-2">
               <Input
                 value={st.customerName}
@@ -140,7 +231,7 @@ export function StatementEditor({ initial }: { initial: Statement }) {
               />
             </Field>
             <Field label="Currency">
-              <Select value={st.currency} onValueChange={(v) => patch({ currency: v as any })}>
+              <Select value={st.currency} onValueChange={(v) => patch({ currency: v as Currency })}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -181,6 +272,12 @@ export function StatementEditor({ initial }: { initial: Statement }) {
                 onChange={(e) => patch({ openingBalance: Number(e.target.value) })}
               />
             </Field>
+            <div className="col-span-2">
+              <Button type="button" size="sm" variant="outline" onClick={saveClientAccount}>
+                <UserPlus className="size-4" />
+                Save as client account
+              </Button>
+            </div>
           </CardContent>
         </Card>
 

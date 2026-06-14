@@ -256,6 +256,7 @@ export interface StatementTxn {
 export interface Statement {
   id: string;
   kind: "statement";
+  clientId?: string;
   accountName: string;
   accountNumber: string;
   customerName: string;
@@ -477,6 +478,8 @@ async function saveCollection<T extends StoreValue>(name: CollectionName, value:
     body: JSON.stringify({ collection: name, value }),
   });
   if (!res.ok) throw new Error(`Failed to save ${name}: ${res.status}`);
+  const data = (await res.json().catch(() => null)) as { ok?: boolean } | null;
+  if (!data?.ok) throw new Error(`Failed to confirm ${name} was saved`);
 }
 
 export function uid() {
@@ -527,9 +530,12 @@ function useStore<T extends StoreValue>(name: CollectionName, fallback: T) {
       const v = typeof next === "function" ? (next as (p: T) => T)(current) : next;
       setCached(name, v);
       writeLocal(key, v);
-      saveCollection(name, v).catch((error) => {
-        console.error(error);
-      });
+      return saveCollection(name, v)
+        .then(() => true)
+        .catch((error) => {
+          console.error(error);
+          return false;
+        });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [name, key],
