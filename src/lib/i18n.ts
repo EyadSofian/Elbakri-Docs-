@@ -2,7 +2,7 @@ export type Lang = "en" | "ar";
 
 export const T = {
   en: {
-    taxInvoice: "TAX INVOICE",
+    taxInvoice: "INVOICE",
     travelServices: "Travel Services",
     statementOfAccount: "STATEMENT OF ACCOUNT",
     reservationVoucher: "RESERVATION VOUCHER",
@@ -181,7 +181,7 @@ export const T = {
     generateConsolidated: "Generate Consolidated Invoice",
   },
   ar: {
-    taxInvoice: "فاتورة ضريبية",
+    taxInvoice: "فاتورة",
     travelServices: "خدمات سفر وسياحة",
     statementOfAccount: "كشف حساب",
     reservationVoucher: "قسيمة حجز",

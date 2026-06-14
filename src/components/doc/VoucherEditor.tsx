@@ -14,18 +14,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Save, Download, Printer, Trash2, Copy, Plus } from "lucide-react";
+import { Save, Download, Printer, Trash2, Copy, Plus, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import {
   SERVICE_TYPES,
   emptyServiceItem,
   useVouchers,
   useSuppliers,
+  useClients,
   uid,
   type ServiceItem,
   type ServiceType,
   type Voucher,
   type Supplier,
+  type Client,
 } from "@/lib/storage";
 import { VoucherPreview } from "@/components/doc/VoucherPreview";
 import { PickerCombo } from "@/components/doc/PickerCombo";
@@ -221,6 +223,7 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
   const [voucher, setVoucher] = useState<Voucher>(() => ensureVoucherServices(initial));
   const [vouchers, setVouchers] = useVouchers();
   const [suppliers, setSuppliers] = useSuppliers();
+  const [clients, setClients] = useClients();
   const [lang, setLang] = useState<Lang>("en");
   const previewRef = useRef<HTMLDivElement>(null);
   const nav = useNavigate();
@@ -323,6 +326,63 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
       return [data, ...prev];
     });
     toast.success("Supplier saved");
+  };
+
+  const pickGuestAccount = (client: Client | null) => {
+    if (!client) {
+      patch({ clientId: undefined });
+      return;
+    }
+    const guestName =
+      client.type === "company" && client.contactPerson?.trim()
+        ? client.contactPerson.trim()
+        : client.name;
+    patch({
+      clientId: client.id,
+      leaderGuest: guestName,
+      guestNames: voucher.guestNames.trim() ? voucher.guestNames : guestName,
+    });
+  };
+
+  const saveGuestAccount = () => {
+    const firstGuest = voucher.guestNames
+      .split(/\r?\n/)
+      .map((name) => name.trim())
+      .find(Boolean);
+    const name = voucher.leaderGuest.trim() || firstGuest;
+    if (!name) {
+      toast.error("Leader guest or guest name required");
+      return;
+    }
+
+    const existing = clients.find((client) => client.name.toLowerCase() === name.toLowerCase());
+    const clientId = existing?.id || uid();
+    const client: Client = existing
+      ? { ...existing, name, type: existing.type || "individual" }
+      : {
+          id: clientId,
+          type: "individual",
+          name,
+          contactPerson: "",
+          address: "",
+          taxId: "",
+          accountNumber: "",
+          email: "",
+          phone: "",
+          notes: "",
+        };
+
+    setClients((prev) =>
+      existing
+        ? prev.map((current) => (current.id === existing.id ? client : current))
+        : [client, ...prev],
+    );
+    patch({
+      clientId,
+      leaderGuest: name,
+      guestNames: voucher.guestNames.trim() ? voucher.guestNames : name,
+    });
+    toast.success(existing ? "Guest account updated" : "Guest account saved");
   };
 
   return (
@@ -495,6 +555,14 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
           <TabsContent value="guests">
             <Card>
               <CardContent className="pt-5 grid grid-cols-2 gap-3">
+                <Field label="Saved guest / client account" className="col-span-2">
+                  <PickerCombo
+                    items={clients}
+                    value={voucher.clientId}
+                    onPick={pickGuestAccount}
+                    placeholder="Select saved guest…"
+                  />
+                </Field>
                 <Field label="Guest names" className="col-span-2">
                   <Textarea
                     rows={3}
@@ -509,6 +577,12 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
                     onChange={(e) => patch({ leaderGuest: e.target.value })}
                   />
                 </Field>
+                <div className="col-span-2">
+                  <Button type="button" size="sm" variant="outline" onClick={saveGuestAccount}>
+                    <UserPlus className="size-4" />
+                    Save guest as client account
+                  </Button>
+                </div>
                 <Field label="Room type">
                   <Input
                     value={voucher.roomType}
