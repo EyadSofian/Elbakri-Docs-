@@ -16,6 +16,48 @@ async function waitForImages(root: HTMLElement) {
   );
 }
 
+function getAvoidBreakIntervals(root: HTMLElement, canvas: HTMLCanvasElement) {
+  const rootRect = root.getBoundingClientRect();
+  if (!rootRect.height) return [];
+  const scaleY = canvas.height / rootRect.height;
+  const selectors = "tr, footer, .pdf-avoid-break";
+
+  return Array.from(root.querySelectorAll<HTMLElement>(selectors))
+    .map((el) => {
+      const rect = el.getBoundingClientRect();
+      return {
+        top: Math.max(0, (rect.top - rootRect.top) * scaleY),
+        bottom: Math.min(canvas.height, (rect.bottom - rootRect.top) * scaleY),
+      };
+    })
+    .filter((interval) => interval.bottom - interval.top > 2)
+    .sort((a, b) => a.top - b.top);
+}
+
+function choosePageCut(
+  startY: number,
+  targetY: number,
+  totalHeight: number,
+  pageHeight: number,
+  avoidIntervals: Array<{ top: number; bottom: number }>,
+) {
+  let cutY = Math.min(targetY, totalHeight);
+  const minUsefulPage = pageHeight * 0.35;
+
+  for (const interval of avoidIntervals) {
+    if (interval.top <= startY + 1) continue;
+    if (interval.top < cutY && cutY < interval.bottom) {
+      const candidate = interval.top;
+      if (candidate - startY >= minUsefulPage) {
+        cutY = candidate;
+      }
+      break;
+    }
+  }
+
+  return Math.max(startY + 1, Math.min(cutY, totalHeight));
+}
+
 export async function exportElementToPdf(
   element: HTMLElement,
   filename: string,
@@ -47,6 +89,7 @@ export async function exportElementToPdf(
     const pageH = pdf.internal.pageSize.getHeight();
     const imgW = pageW;
     const imgH = (canvas.height * imgW) / canvas.width;
+    const avoidBreakIntervals = getAvoidBreakIntervals(element, canvas);
 
     if (imgH <= pageH) {
       pdf.addImage(imgData, "JPEG", 0, 0, imgW, imgH);
@@ -56,7 +99,8 @@ export async function exportElementToPdf(
       const pageHpx = pageH * pxPerMm;
       let y = 0;
       while (y < canvas.height) {
-        const sliceH = Math.min(pageHpx, canvas.height - y);
+        const cutY = choosePageCut(y, y + pageHpx, canvas.height, pageHpx, avoidBreakIntervals);
+        const sliceH = Math.min(cutY - y, canvas.height - y);
         const slice = document.createElement("canvas");
         slice.width = canvas.width;
         slice.height = sliceH;

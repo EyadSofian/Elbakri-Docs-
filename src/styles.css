@@ -138,6 +138,12 @@
   width: 100%;
   border-collapse: collapse;
 }
+.doc-sheet tr,
+.doc-sheet footer,
+.pdf-avoid-break {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
 .doc-sheet th,
 .doc-sheet td {
   padding: 6px 8px;
