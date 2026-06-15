@@ -180,6 +180,24 @@
   margin-right: auto;
 }
 
+.invoice-stamp {
+  display: flex;
+  justify-content: flex-end;
+  min-height: 22mm;
+  margin-top: 12px;
+  margin-bottom: -4px;
+  pointer-events: none;
+}
+
+.invoice-stamp img {
+  width: 54mm;
+  max-width: 205px;
+  height: auto;
+  opacity: 0.88;
+  transform: rotate(-1.2deg);
+  object-fit: contain;
+}
+
 /* Status badges (used in bulk export & preview overlays) */
 .status-badge {
   display: inline-block;

@@ -4,6 +4,7 @@ import { computeInvoiceTotals, formatDate, formatMoney } from "@/lib/format";
 import { tt, type Lang } from "@/lib/i18n";
 
 const serviceLabel = (t: string) => SERVICE_TYPES.find((s) => s.value === t)?.label ?? t;
+const stampUrl = "/elbakri-stamp.png";
 
 function itemSummary(it: Invoice["items"][number]) {
   const m = it.meta || {};
@@ -259,6 +260,10 @@ export function InvoicePreview({ invoice, lang = "en" }: { invoice: Invoice; lan
           </table>
         </div>
       </section>
+
+      <div className="invoice-stamp" aria-hidden="true">
+        <img src={stampUrl} alt="" crossOrigin="anonymous" />
+      </div>
 
       <DocFooter lang={lang} />
     </div>
