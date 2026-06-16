@@ -136,6 +136,8 @@ export interface Invoice {
   client: Client;
   items: ServiceItem[];
   notes: string;
+  showPaymentMethods?: boolean;
+  showTerms?: boolean;
   payment: {
     bankName: string;
     accountNumber: string;
@@ -305,6 +307,7 @@ export interface Voucher {
   diningNotes: string;
   checkInOutTimes: string;
   finalTerms: string;
+  showTerms?: boolean;
   createdAt: string;
 }
 

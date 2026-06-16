@@ -20,7 +20,7 @@ function getAvoidBreakIntervals(root: HTMLElement, canvas: HTMLCanvasElement) {
   const rootRect = root.getBoundingClientRect();
   if (!rootRect.height) return [];
   const scaleY = canvas.height / rootRect.height;
-  const selectors = "tr, footer, .pdf-avoid-break";
+  const selectors = "tr, li, footer, .pdf-avoid-break";
 
   return Array.from(root.querySelectorAll<HTMLElement>(selectors))
     .map((el) => {

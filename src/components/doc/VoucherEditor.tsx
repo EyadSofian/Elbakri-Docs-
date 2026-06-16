@@ -747,6 +747,16 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
                     placeholder="Default text will print if empty."
                   />
                 </Field>
+                <div className="flex items-center gap-2 rounded border p-3">
+                  <Checkbox
+                    id="showVoucherTerms"
+                    checked={voucher.showTerms === true}
+                    onCheckedChange={(c) => patch({ showTerms: c === true })}
+                  />
+                  <Label htmlFor="showVoucherTerms" className="text-sm">
+                    Add terms page
+                  </Label>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -818,6 +828,7 @@ export function buildBlankVoucher(opts: { number: string }): Voucher {
     diningNotes: "",
     checkInOutTimes: "Check-in from 14:00 · Check-out by 12:00",
     finalTerms: "",
+    showTerms: false,
     createdAt: new Date().toISOString(),
   };
 }

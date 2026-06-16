@@ -139,6 +139,7 @@
   border-collapse: collapse;
 }
 .doc-sheet tr,
+.doc-sheet li,
 .doc-sheet footer,
 .pdf-avoid-break {
   break-inside: avoid;
@@ -202,6 +203,66 @@
   opacity: 0.88;
   transform: rotate(-1.2deg);
   object-fit: contain;
+}
+
+.invoice-notes-payment {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.payment-methods-box {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #fafafa;
+  padding: 8px;
+}
+
+.payment-methods-box ul {
+  margin: 0;
+  padding-left: 14px;
+  color: #374151;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.payment-methods-box li + li {
+  margin-top: 3px;
+}
+
+.terms-sheet {
+  display: flex;
+  flex-direction: column;
+}
+
+.terms-sheet footer {
+  margin-top: auto;
+}
+
+.terms-bismillah {
+  text-align: center;
+  color: #14224a;
+  font-size: 17px;
+  font-weight: 700;
+  margin: 4px 0 12px;
+}
+
+.terms-list {
+  margin: 0;
+  padding-left: 20px;
+  color: #1f2937;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.terms-list li + li {
+  margin-top: 7px;
+}
+
+.doc-sheet[dir="rtl"] .payment-methods-box ul,
+.doc-sheet[dir="rtl"] .terms-list {
+  padding-left: 0;
+  padding-right: 20px;
 }
 
 /* Status badges (used in bulk export & preview overlays) */

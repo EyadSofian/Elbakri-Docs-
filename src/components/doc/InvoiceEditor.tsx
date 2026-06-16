@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -424,7 +425,7 @@ export function InvoiceEditor({ initial }: { initial: Invoice }) {
 
           <TabsContent value="notes">
             <Card>
-              <CardContent className="pt-5">
+              <CardContent className="pt-5 space-y-4">
                 <Field label="Notes (printed on invoice)">
                   <Textarea
                     rows={6}
@@ -432,6 +433,28 @@ export function InvoiceEditor({ initial }: { initial: Invoice }) {
                     onChange={(e) => patch({ notes: e.target.value })}
                   />
                 </Field>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="flex items-center gap-2 rounded border p-3">
+                    <Checkbox
+                      id="showPaymentMethods"
+                      checked={invoice.showPaymentMethods === true}
+                      onCheckedChange={(c) => patch({ showPaymentMethods: c === true })}
+                    />
+                    <Label htmlFor="showPaymentMethods" className="text-sm">
+                      Show payment methods
+                    </Label>
+                  </div>
+                  <div className="flex items-center gap-2 rounded border p-3">
+                    <Checkbox
+                      id="showInvoiceTerms"
+                      checked={invoice.showTerms === true}
+                      onCheckedChange={(c) => patch({ showTerms: c === true })}
+                    />
+                    <Label htmlFor="showInvoiceTerms" className="text-sm">
+                      Add terms page
+                    </Label>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -520,6 +543,8 @@ export function buildBlankInvoice(opts: { number: string; defaults: any }): Invo
     client: emptyClient(),
     items: [emptyServiceItem("hotel")].map((i) => ({ ...i, total: computeItemTotal(i) })),
     notes: "",
+    showPaymentMethods: false,
+    showTerms: false,
     payment: { ...opts.defaults.defaultBank },
     vatPercent: 0,
     discountType: "amount",

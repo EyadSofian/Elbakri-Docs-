@@ -2,6 +2,7 @@ import { DocHeader, DocFooter } from "./DocChrome";
 import { SERVICE_TYPES, type ServiceItem, type Voucher } from "@/lib/storage";
 import { formatDate, nightsBetween } from "@/lib/format";
 import { tt, rateBasisLabel, type Lang } from "@/lib/i18n";
+import { TermsPage } from "@/components/doc/CommercialTerms";
 
 const serviceLabel = (type: string) =>
   SERVICE_TYPES.find((service) => service.value === type)?.label ?? type;
@@ -139,135 +140,142 @@ export function VoucherPreview({ voucher, lang = "en" }: { voucher: Voucher; lan
     voucher.diningNotes;
 
   return (
-    <div className="doc-sheet" dir={dir}>
-      <DocHeader
-        title={t.reservationVoucher}
-        subtitle={t.hotelServiceVoucher}
-        number={voucher.number}
-        date={formatDate(voucher.date)}
-        lang={lang}
-      />
+    <>
+      <div className="doc-sheet" dir={dir}>
+        <DocHeader
+          title={t.reservationVoucher}
+          subtitle={t.hotelServiceVoucher}
+          number={voucher.number}
+          date={formatDate(voucher.date)}
+          lang={lang}
+        />
 
-      <table className="border border-neutral-200 rounded overflow-hidden text-[11px]">
-        <tbody>
-          <Row label={t.serviceType} value={serviceNames || voucher.serviceType.toUpperCase()} />
-          <Row
-            label={t.serviceProvider}
-            value={`${voucher.providerName}${voucher.hotelRating ? ` (${voucher.hotelRating} star)` : ""}`}
-          />
-          <Row label={t.address} value={voucher.address} />
-          <Row label={t.serviceBookingRef} value={voucher.serviceBookingRef} />
-          <Row label={t.multipleBookingRef} value={voucher.multipleBookingRef} />
-          <Row label={t.confirmationNumber} value={voucher.confirmationNumber} />
-          <Row label={t.guestNames} value={voucher.guestNames} />
-          <Row label={t.leaderGuest} value={voucher.leaderGuest} />
-          <Row label={t.roomType} value={voucher.roomType} />
-          <Row label={t.rateBasis} value={rateBasisLabel(voucher.rateBasis, lang)} />
-          <Row label={t.childrenAges} value={childrenAgesText} />
-          <Row label={t.specialRemarks} value={voucher.remarks} />
-        </tbody>
-      </table>
-
-      <div className="mt-4">
-        <div className="doc-gold-bg px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider">
-          Voucher Services
-        </div>
-        <table className="border border-neutral-200 border-t-0 text-[10.5px]">
-          <thead>
-            <tr className="bg-neutral-100 text-left">
-              <th className="w-8">#</th>
-              <th className="w-36">Service</th>
-              <th>Details</th>
-              <th className="w-36">Guest / Ref</th>
-            </tr>
-          </thead>
+        <table className="border border-neutral-200 rounded overflow-hidden text-[11px]">
           <tbody>
-            {items.map((item, index) => {
-              const details = itemSummary(item);
-              return (
-                <tr key={item.id || index} className="border-t border-neutral-200 align-top">
-                  <td className="text-neutral-500">{index + 1}</td>
-                  <td className="font-semibold doc-navy">{serviceLabel(item.type)}</td>
-                  <td>
-                    {item.description && <div className="text-neutral-700">{item.description}</div>}
-                    {details && <div className="text-neutral-600">{details}</div>}
-                    {item.notes && (
-                      <div className="text-neutral-500 text-[9.5px]">{item.notes}</div>
-                    )}
-                  </td>
-                  <td>
-                    {item.passengerName && <div>{item.passengerName}</div>}
-                    {item.bookingRef && (
-                      <div className="text-neutral-500 text-[9.5px]">Booking {item.bookingRef}</div>
-                    )}
-                    {item.supplierRef && (
-                      <div className="text-neutral-500 text-[9.5px]">
-                        Supplier {item.supplierRef}
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
+            <Row label={t.serviceType} value={serviceNames || voucher.serviceType.toUpperCase()} />
+            <Row
+              label={t.serviceProvider}
+              value={`${voucher.providerName}${voucher.hotelRating ? ` (${voucher.hotelRating} star)` : ""}`}
+            />
+            <Row label={t.address} value={voucher.address} />
+            <Row label={t.serviceBookingRef} value={voucher.serviceBookingRef} />
+            <Row label={t.multipleBookingRef} value={voucher.multipleBookingRef} />
+            <Row label={t.confirmationNumber} value={voucher.confirmationNumber} />
+            <Row label={t.guestNames} value={voucher.guestNames} />
+            <Row label={t.leaderGuest} value={voucher.leaderGuest} />
+            <Row label={t.roomType} value={voucher.roomType} />
+            <Row label={t.rateBasis} value={rateBasisLabel(voucher.rateBasis, lang)} />
+            <Row label={t.childrenAges} value={childrenAgesText} />
+            <Row label={t.specialRemarks} value={voucher.remarks} />
           </tbody>
         </table>
-      </div>
 
-      {hasHotelService && (
         <div className="mt-4">
           <div className="doc-gold-bg px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider">
-            {t.reservationSummary}
+            Voucher Services
           </div>
-          <table className="border border-neutral-200 border-t-0 text-[11px]">
+          <table className="border border-neutral-200 border-t-0 text-[10.5px]">
             <thead>
-              <tr className="bg-neutral-100">
-                <th>{t.checkIn}</th>
-                <th>{t.checkOut}</th>
-                <th>{t.nights}</th>
-                <th>{t.rooms}</th>
-                <th>{t.adults}</th>
-                <th>{t.children}</th>
+              <tr className="bg-neutral-100 text-left">
+                <th className="w-8">#</th>
+                <th className="w-36">Service</th>
+                <th>Details</th>
+                <th className="w-36">Guest / Ref</th>
               </tr>
             </thead>
             <tbody>
-              <tr className="border-t border-neutral-200 text-center">
-                <td className="font-semibold">{formatDate(voucher.checkIn)}</td>
-                <td className="font-semibold">{formatDate(voucher.checkOut)}</td>
-                <td>{nights}</td>
-                <td>{voucher.numberOfRooms}</td>
-                <td>{voucher.adults}</td>
-                <td>{voucher.children}</td>
-              </tr>
+              {items.map((item, index) => {
+                const details = itemSummary(item);
+                return (
+                  <tr key={item.id || index} className="border-t border-neutral-200 align-top">
+                    <td className="text-neutral-500">{index + 1}</td>
+                    <td className="font-semibold doc-navy">{serviceLabel(item.type)}</td>
+                    <td>
+                      {item.description && (
+                        <div className="text-neutral-700">{item.description}</div>
+                      )}
+                      {details && <div className="text-neutral-600">{details}</div>}
+                      {item.notes && (
+                        <div className="text-neutral-500 text-[9.5px]">{item.notes}</div>
+                      )}
+                    </td>
+                    <td>
+                      {item.passengerName && <div>{item.passengerName}</div>}
+                      {item.bookingRef && (
+                        <div className="text-neutral-500 text-[9.5px]">
+                          Booking {item.bookingRef}
+                        </div>
+                      )}
+                      {item.supplierRef && (
+                        <div className="text-neutral-500 text-[9.5px]">
+                          Supplier {item.supplierRef}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
-      )}
 
-      {hasPolicies && (
-        <div className="mt-4">
-          <div className="doc-navy-bg px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider">
-            {t.hotelInfoPolicies}
+        {hasHotelService && (
+          <div className="mt-4">
+            <div className="doc-gold-bg px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider">
+              {t.reservationSummary}
+            </div>
+            <table className="border border-neutral-200 border-t-0 text-[11px]">
+              <thead>
+                <tr className="bg-neutral-100">
+                  <th>{t.checkIn}</th>
+                  <th>{t.checkOut}</th>
+                  <th>{t.nights}</th>
+                  <th>{t.rooms}</th>
+                  <th>{t.adults}</th>
+                  <th>{t.children}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-t border-neutral-200 text-center">
+                  <td className="font-semibold">{formatDate(voucher.checkIn)}</td>
+                  <td className="font-semibold">{formatDate(voucher.checkOut)}</td>
+                  <td>{nights}</td>
+                  <td>{voucher.numberOfRooms}</td>
+                  <td>{voucher.adults}</td>
+                  <td>{voucher.children}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <table className="border border-neutral-200 border-t-0 text-[11px] w-full">
-            <tbody>
-              <Row label="Check-in / out" value={voucher.checkInOutTimes} />
-              <Row label="Restrictions" value={voucher.checkInRestrictions} />
-              <Row label="Age" value={voucher.ageRequirements} />
-              <Row label="Pets" value={voucher.petsPolicy} />
-              <Row label="Front Desk" value={voucher.frontDeskNotes} />
-              <Row label={t.identificationRequirements} value={idText} />
-              <Row label="Children / Extra Bed" value={voucher.childrenExtraBedPolicy} />
-              <Row label="Dining" value={voucher.diningNotes} />
-            </tbody>
-          </table>
+        )}
+
+        {hasPolicies && (
+          <div className="mt-4">
+            <div className="doc-navy-bg px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider">
+              {t.hotelInfoPolicies}
+            </div>
+            <table className="border border-neutral-200 border-t-0 text-[11px] w-full">
+              <tbody>
+                <Row label="Check-in / out" value={voucher.checkInOutTimes} />
+                <Row label="Restrictions" value={voucher.checkInRestrictions} />
+                <Row label="Age" value={voucher.ageRequirements} />
+                <Row label="Pets" value={voucher.petsPolicy} />
+                <Row label="Front Desk" value={voucher.frontDeskNotes} />
+                <Row label={t.identificationRequirements} value={idText} />
+                <Row label="Children / Extra Bed" value={voucher.childrenExtraBedPolicy} />
+                <Row label="Dining" value={voucher.diningNotes} />
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <div className="mt-5 p-3 border-l-4 border-amber-500 bg-amber-50 text-[10px] text-neutral-700">
+          {voucher.finalTerms || t.voucherDefaultTerms}
         </div>
-      )}
 
-      <div className="mt-5 p-3 border-l-4 border-amber-500 bg-amber-50 text-[10px] text-neutral-700">
-        {voucher.finalTerms || t.voucherDefaultTerms}
+        <DocFooter lang={lang} />
       </div>
-
-      <DocFooter lang={lang} />
-    </div>
+      {voucher.showTerms && <TermsPage lang={lang} documentType="voucher" />}
+    </>
   );
 }
