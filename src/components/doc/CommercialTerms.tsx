@@ -5,7 +5,6 @@ type TermsDocumentType = "invoice" | "voucher";
 
 const termsCopy = {
   en: {
-    bismillah: "In the name of Allah, the Most Gracious, the Most Merciful",
     title: "Terms & Conditions",
     subtitle: {
       invoice: "Invoice terms",
@@ -27,7 +26,6 @@ const termsCopy = {
     ],
   },
   ar: {
-    bismillah: "بسم الله الرحمن الرحيم",
     title: "الشروط والأحكام",
     subtitle: {
       invoice: "شروط الفاتورة",
@@ -54,23 +52,59 @@ const paymentCopy = {
   en: {
     title: "Payment Methods",
     items: [
-      "At the company office.",
-      "Company account deposit or bank transfer: 100067884633, ELBAKRI OVER SEAS.",
-      "InstaPay: 01147515456, MAHMOUD SAEED. InstaPay: 01115596215, AHMED ELBAKRI.",
-      "Electronic wallet: 01115596215, AHMED ELBAKRI, plus 1%.",
-      "Installment and payment partners: Valu, Souhoola, Contact, Tru, Aman, Clever, Halan, and Fawry Card.",
-      "Visa, National Bank of Egypt, Apple Pay, Meeza, or payment link.",
+      {
+        label: "Company office",
+        detail: "Payment at Elbakri Overseas office.",
+      },
+      {
+        label: "Bank transfer",
+        detail: "100067884633 - ELBAKRI OVER SEAS.",
+      },
+      {
+        label: "InstaPay",
+        detail: "01147515456 - MAHMOUD SAEED / 01115596215 - AHMED ELBAKRI.",
+      },
+      {
+        label: "Electronic wallet",
+        detail: "01115596215 - AHMED ELBAKRI. A 1% wallet fee applies.",
+      },
+      {
+        label: "Installments",
+        detail: "Valu, Souhoola, Contact, Tru, Aman, Clever, Halan, or Fawry Card.",
+      },
+      {
+        label: "Cards and links",
+        detail: "Visa, National Bank of Egypt, Apple Pay, Meeza, or payment link.",
+      },
     ],
   },
   ar: {
     title: "طرق الدفع",
     items: [
-      "عن طريق مقر الشركة.",
-      "عن طريق حساب الشركة إيداع أو تحويل: 100067884633، ELBAKRI OVER SEAS.",
-      "عن طريق إنستا باي: 01147515456، MAHMOUD SAEED. إنستا باي: 01115596215، AHMED ELBAKRI.",
-      "عن طريق محفظة إلكترونية: 01115596215، AHMED ELBAKRI، مع زيادة 1%.",
-      "عن طريق فاليو / سهولة / كونتكت / ترو / أمان / كليفر / حالا / كارت فوري.",
-      "عن طريق فيزا / البنك الأهلي / Apple Pay / ميزة / لينك دفع.",
+      {
+        label: "مقر الشركة",
+        detail: "الدفع داخل مقر شركة البكري أوفر سيز.",
+      },
+      {
+        label: "إيداع أو تحويل بنكي",
+        detail: "100067884633 - ELBAKRI OVER SEAS.",
+      },
+      {
+        label: "إنستا باي",
+        detail: "01147515456 - MAHMOUD SAEED / 01115596215 - AHMED ELBAKRI.",
+      },
+      {
+        label: "محفظة إلكترونية",
+        detail: "01115596215 - AHMED ELBAKRI. تضاف رسوم 1%.",
+      },
+      {
+        label: "تقسيط",
+        detail: "فاليو، سهولة، كونتكت، ترو، أمان، كليفر، حالا، أو كارت فوري.",
+      },
+      {
+        label: "كروت ولينك دفع",
+        detail: "فيزا، البنك الأهلي، Apple Pay، ميزة، أو لينك دفع.",
+      },
     ],
   },
 } as const;
@@ -88,7 +122,6 @@ export function TermsPage({
   return (
     <div className="doc-sheet terms-sheet pdf-avoid-break" dir={dir}>
       <DocHeader title={copy.title} subtitle={copy.subtitle[documentType]} lang={lang} />
-      <div className="terms-bismillah">{copy.bismillah}</div>
       <ol className="terms-list">
         {copy.items.map((item) => (
           <li key={item}>{item}</li>
@@ -104,12 +137,18 @@ export function PaymentMethodsBox({ lang = "en" }: { lang?: Lang }) {
 
   return (
     <div className="payment-methods-box pdf-avoid-break">
-      <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">{copy.title}</div>
-      <ul>
-        {copy.items.map((item) => (
-          <li key={item}>{item}</li>
+      <div className="payment-methods-heading">{copy.title}</div>
+      <div className="payment-methods-list">
+        {copy.items.map((item, index) => (
+          <div className="payment-method-row" key={item.label}>
+            <span className="payment-method-index">{index + 1}</span>
+            <span className="payment-method-content">
+              <span className="payment-method-label">{item.label}</span>
+              <span className="payment-method-detail">{item.detail}</span>
+            </span>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

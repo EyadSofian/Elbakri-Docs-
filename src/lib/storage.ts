@@ -138,6 +138,7 @@ export interface Invoice {
   notes: string;
   showPaymentMethods?: boolean;
   showTerms?: boolean;
+  termsLang?: "en" | "ar";
   payment: {
     bankName: string;
     accountNumber: string;
@@ -308,6 +309,7 @@ export interface Voucher {
   checkInOutTimes: string;
   finalTerms: string;
   showTerms?: boolean;
+  termsLang?: "en" | "ar";
   createdAt: string;
 }
 

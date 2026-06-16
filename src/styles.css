@@ -212,22 +212,106 @@
 }
 
 .payment-methods-box {
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d7deea;
   border-radius: 6px;
-  background: #fafafa;
-  padding: 8px;
+  background: linear-gradient(180deg, #fbfcff 0%, #f8fafc 100%);
+  padding: 10px;
 }
 
-.payment-methods-box ul {
-  margin: 0;
-  padding-left: 14px;
-  color: #374151;
+.payment-methods-heading,
+.payment-section-title {
+  color: #14224a;
   font-size: 10px;
-  line-height: 1.45;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 7px;
 }
 
-.payment-methods-box li + li {
-  margin-top: 3px;
+.payment-methods-list,
+.payment-note-list {
+  display: grid;
+  gap: 5px;
+}
+
+.payment-method-row,
+.payment-note-item {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 6px;
+  align-items: start;
+}
+
+.payment-method-index,
+.payment-note-item > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #14224a;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.payment-method-content {
+  min-width: 0;
+}
+
+.payment-method-label,
+.payment-note-title {
+  display: block;
+  color: #14224a;
+  font-size: 9.5px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.payment-method-detail,
+.payment-note-item p {
+  display: block;
+  margin: 1px 0 0;
+  color: #374151;
+  font-size: 9.4px;
+  line-height: 1.35;
+}
+
+.invoice-payment-card {
+  border: 1px solid #d7deea;
+  border-radius: 6px;
+  background: #fff;
+  padding: 10px;
+}
+
+.payment-info-table {
+  font-size: 10px;
+  margin-bottom: 8px;
+}
+
+.payment-info-table td {
+  padding: 3px 0;
+}
+
+.payment-info-table td:first-child {
+  width: 74px;
+  color: #64748b;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.payment-info-table td:last-child {
+  color: #111827;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.payment-note-box {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 7px;
 }
 
 .terms-sheet {
@@ -237,14 +321,6 @@
 
 .terms-sheet footer {
   margin-top: auto;
-}
-
-.terms-bismillah {
-  text-align: center;
-  color: #14224a;
-  font-size: 17px;
-  font-weight: 700;
-  margin: 4px 0 12px;
 }
 
 .terms-list {
@@ -259,10 +335,31 @@
   margin-top: 7px;
 }
 
-.doc-sheet[dir="rtl"] .payment-methods-box ul,
 .doc-sheet[dir="rtl"] .terms-list {
   padding-left: 0;
   padding-right: 20px;
+}
+
+.doc-sheet[dir="rtl"] .payment-method-row,
+.doc-sheet[dir="rtl"] .payment-note-item {
+  grid-template-columns: minmax(0, 1fr) 18px;
+}
+
+.doc-sheet[dir="rtl"] .payment-method-index,
+.doc-sheet[dir="rtl"] .payment-note-item > span {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.doc-sheet[dir="rtl"] .payment-method-content,
+.doc-sheet[dir="rtl"] .payment-note-item p {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.doc-sheet[dir="rtl"] .payment-info-table td:first-child {
+  padding-left: 8px;
+  padding-right: 0;
 }
 
 /* Status badges (used in bulk export & preview overlays) */

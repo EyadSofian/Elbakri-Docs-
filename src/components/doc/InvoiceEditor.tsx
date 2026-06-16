@@ -448,12 +448,33 @@ export function InvoiceEditor({ initial }: { initial: Invoice }) {
                     <Checkbox
                       id="showInvoiceTerms"
                       checked={invoice.showTerms === true}
-                      onCheckedChange={(c) => patch({ showTerms: c === true })}
+                      onCheckedChange={(c) =>
+                        patch({
+                          showTerms: c === true,
+                          termsLang: invoice.termsLang ?? lang,
+                        })
+                      }
                     />
                     <Label htmlFor="showInvoiceTerms" className="text-sm">
                       Add terms page
                     </Label>
                   </div>
+                  {invoice.showTerms && (
+                    <Field label="Terms language">
+                      <Select
+                        value={invoice.termsLang ?? lang}
+                        onValueChange={(value) => patch({ termsLang: value as Lang })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="en">English terms</SelectItem>
+                          <SelectItem value="ar">Arabic terms</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -545,6 +566,7 @@ export function buildBlankInvoice(opts: { number: string; defaults: any }): Invo
     notes: "",
     showPaymentMethods: false,
     showTerms: false,
+    termsLang: "en",
     payment: { ...opts.defaults.defaultBank },
     vatPercent: 0,
     discountType: "amount",

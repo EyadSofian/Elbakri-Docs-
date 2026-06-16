@@ -751,12 +751,33 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
                   <Checkbox
                     id="showVoucherTerms"
                     checked={voucher.showTerms === true}
-                    onCheckedChange={(c) => patch({ showTerms: c === true })}
+                    onCheckedChange={(c) =>
+                      patch({
+                        showTerms: c === true,
+                        termsLang: voucher.termsLang ?? lang,
+                      })
+                    }
                   />
                   <Label htmlFor="showVoucherTerms" className="text-sm">
                     Add terms page
                   </Label>
                 </div>
+                {voucher.showTerms && (
+                  <Field label="Terms language">
+                    <Select
+                      value={voucher.termsLang ?? lang}
+                      onValueChange={(value) => patch({ termsLang: value as Lang })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="en">English terms</SelectItem>
+                        <SelectItem value="ar">Arabic terms</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -829,6 +850,7 @@ export function buildBlankVoucher(opts: { number: string }): Voucher {
     checkInOutTimes: "Check-in from 14:00 · Check-out by 12:00",
     finalTerms: "",
     showTerms: false,
+    termsLang: "en",
     createdAt: new Date().toISOString(),
   };
 }

@@ -110,6 +110,7 @@ function itemSummary(item: ServiceItem) {
 export function VoucherPreview({ voucher, lang = "en" }: { voucher: Voucher; lang?: Lang }) {
   const t = tt(lang);
   const dir = lang === "ar" ? "rtl" : "ltr";
+  const termsLang = voucher.termsLang ?? lang;
   const nights = nightsBetween(voucher.checkIn, voucher.checkOut);
   const items = voucher.items?.length ? voucher.items : legacyVoucherItems(voucher);
   const serviceNames = items.map((item) => serviceLabel(item.type)).join(", ");
@@ -275,7 +276,7 @@ export function VoucherPreview({ voucher, lang = "en" }: { voucher: Voucher; lan
 
         <DocFooter lang={lang} />
       </div>
-      {voucher.showTerms && <TermsPage lang={lang} documentType="voucher" />}
+      {voucher.showTerms && <TermsPage lang={termsLang} documentType="voucher" />}
     </>
   );
 }
