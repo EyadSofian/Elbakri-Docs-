@@ -2,7 +2,7 @@ import { DocHeader, DocFooter } from "./DocChrome";
 import { SERVICE_TYPES, type Invoice } from "@/lib/storage";
 import { computeInvoiceTotals, formatDate, formatMoney } from "@/lib/format";
 import { tt, type Lang } from "@/lib/i18n";
-import { PaymentMethodsBox, TermsPage } from "@/components/doc/CommercialTerms";
+import { TermsPage } from "@/components/doc/CommercialTerms";
 
 const serviceLabel = (t: string) => SERVICE_TYPES.find((s) => s.value === t)?.label ?? t;
 const stampUrl = "/elbakri-stamp.png";
@@ -40,29 +40,11 @@ function itemSummary(it: Invoice["items"][number]) {
   return parts.join(" · ");
 }
 
-function splitPaymentNotes(notes: string) {
-  return notes
-    .split(/(?:\/\*\/|\r?\n)+/)
-    .map((part) => part.replace(/^\s*\d+\s*[:.)-]\s*/, "").trim())
-    .filter(Boolean);
-}
-
 export function InvoicePreview({ invoice, lang = "en" }: { invoice: Invoice; lang?: Lang }) {
   const totals = computeInvoiceTotals(invoice);
   const t = tt(lang);
   const dir = lang === "ar" ? "rtl" : "ltr";
   const termsLang = invoice.termsLang ?? lang;
-  const hasPaymentDetails = Boolean(
-    invoice.payment.bankName ||
-    invoice.payment.accountNumber ||
-    invoice.payment.iban ||
-    invoice.payment.swift,
-  );
-  const paymentNotes = invoice.payment.notes?.trim()
-    ? splitPaymentNotes(invoice.payment.notes)
-    : [];
-  const paymentNoteTitle = lang === "ar" ? "ملاحظات الدفع" : "Payment note";
-
   return (
     <>
       <div className="doc-sheet" dir={dir}>
@@ -173,67 +155,16 @@ export function InvoicePreview({ invoice, lang = "en" }: { invoice: Invoice; lan
 
         <section className="grid grid-cols-5 gap-6 mt-4">
           <div className="col-span-3 space-y-3">
-            {(invoice.notes || invoice.showPaymentMethods) && (
+            {invoice.notes && (
               <div className="invoice-notes-payment">
-                {invoice.notes && (
-                  <div>
-                    <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">
-                      {t.notes}
-                    </div>
-                    <div className="text-[10.5px] whitespace-pre-line border rounded p-2 bg-neutral-50">
-                      {invoice.notes}
-                    </div>
+                <div>
+                  <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">
+                    {t.notes}
                   </div>
-                )}
-                {invoice.showPaymentMethods && <PaymentMethodsBox lang={lang} />}
-              </div>
-            )}
-            {(hasPaymentDetails || paymentNotes.length > 0) && (
-              <div className="invoice-payment-card pdf-avoid-break">
-                <div className="payment-section-title">{t.paymentInformation}</div>
-                {hasPaymentDetails && (
-                  <table className="payment-info-table">
-                    <tbody>
-                      {invoice.payment.bankName && (
-                        <tr>
-                          <td>{t.bank}</td>
-                          <td>{invoice.payment.bankName}</td>
-                        </tr>
-                      )}
-                      {invoice.payment.accountNumber && (
-                        <tr>
-                          <td>{t.account}</td>
-                          <td>{invoice.payment.accountNumber}</td>
-                        </tr>
-                      )}
-                      {invoice.payment.iban && (
-                        <tr>
-                          <td>{t.iban}</td>
-                          <td>{invoice.payment.iban}</td>
-                        </tr>
-                      )}
-                      {invoice.payment.swift && (
-                        <tr>
-                          <td>{t.swift}</td>
-                          <td>{invoice.payment.swift}</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                )}
-                {paymentNotes.length > 0 && (
-                  <div className="payment-note-box">
-                    <div className="payment-note-title">{paymentNoteTitle}</div>
-                    <div className="payment-note-list">
-                      {paymentNotes.map((note, index) => (
-                        <div className="payment-note-item" key={`${note}-${index}`}>
-                          <span>{index + 1}</span>
-                          <p>{note}</p>
-                        </div>
-                      ))}
-                    </div>
+                  <div className="text-[10.5px] whitespace-pre-line border rounded p-2 bg-neutral-50">
+                    {invoice.notes}
                   </div>
-                )}
+                </div>
               </div>
             )}
           </div>
@@ -300,7 +231,14 @@ export function InvoicePreview({ invoice, lang = "en" }: { invoice: Invoice; lan
 
         <DocFooter lang={lang} />
       </div>
-      {invoice.showTerms && <TermsPage lang={termsLang} documentType="invoice" />}
+      {(invoice.showTerms || invoice.showPaymentMethods) && (
+        <TermsPage
+          lang={termsLang}
+          documentType="invoice"
+          showTerms={invoice.showTerms === true}
+          showPaymentMethods={invoice.showPaymentMethods === true}
+        />
+      )}
     </>
   );
 }

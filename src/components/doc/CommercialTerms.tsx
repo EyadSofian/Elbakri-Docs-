@@ -1,4 +1,3 @@
-import { DocFooter, DocHeader } from "./DocChrome";
 import type { Lang } from "@/lib/i18n";
 
 type TermsDocumentType = "invoice" | "voucher";
@@ -51,6 +50,7 @@ const termsCopy = {
 const paymentCopy = {
   en: {
     title: "Payment Methods",
+    subtitle: "Invoice payment options",
     items: [
       {
         label: "Company office",
@@ -58,7 +58,7 @@ const paymentCopy = {
       },
       {
         label: "Bank transfer",
-        detail: "100067884633 - ELBAKRI OVER SEAS.",
+        detail: "CIB account: 100067884633 - ELBAKRI OVER SEAS.",
       },
       {
         label: "InstaPay",
@@ -70,7 +70,7 @@ const paymentCopy = {
       },
       {
         label: "Installments",
-        detail: "Valu, Souhoola, Contact, Tru, Aman, Clever, Halan, or Fawry Card.",
+        detail: "Valu, Souhoola, Contact, Tru, Aman, Klivvr, Halan, or Fawry Card.",
       },
       {
         label: "Cards and links",
@@ -80,6 +80,7 @@ const paymentCopy = {
   },
   ar: {
     title: "طرق الدفع",
+    subtitle: "خيارات دفع الفاتورة",
     items: [
       {
         label: "مقر الشركة",
@@ -87,7 +88,7 @@ const paymentCopy = {
       },
       {
         label: "إيداع أو تحويل بنكي",
-        detail: "100067884633 - ELBAKRI OVER SEAS.",
+        detail: "حساب CIB: 100067884633 - ELBAKRI OVER SEAS.",
       },
       {
         label: "إنستا باي",
@@ -99,7 +100,7 @@ const paymentCopy = {
       },
       {
         label: "تقسيط",
-        detail: "فاليو، سهولة، كونتكت، ترو، أمان، كليفر، حالا، أو كارت فوري.",
+        detail: "فاليو، سهولة، كونتكت، ترو، أمان، Klivvr، حالا، أو كارت فوري.",
       },
       {
         label: "كروت ولينك دفع",
@@ -112,22 +113,40 @@ const paymentCopy = {
 export function TermsPage({
   lang = "en",
   documentType = "invoice",
+  showTerms = true,
+  showPaymentMethods = false,
 }: {
   lang?: Lang;
   documentType?: TermsDocumentType;
+  showTerms?: boolean;
+  showPaymentMethods?: boolean;
 }) {
   const copy = termsCopy[lang];
+  const payment = paymentCopy[lang];
   const dir = lang === "ar" ? "rtl" : "ltr";
+  const pageTitle = showTerms ? copy.title : payment.title;
+  const pageSubtitle = showTerms ? copy.subtitle[documentType] : payment.subtitle;
 
   return (
     <div className="doc-sheet terms-sheet pdf-avoid-break" dir={dir}>
-      <DocHeader title={copy.title} subtitle={copy.subtitle[documentType]} lang={lang} />
-      <ol className="terms-list">
-        {copy.items.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ol>
-      <DocFooter lang={lang} />
+      <header className="terms-page-title pdf-avoid-break">
+        <div className="terms-page-kicker">{pageSubtitle}</div>
+        <h1 className="terms-page-heading">{pageTitle}</h1>
+      </header>
+
+      {showTerms && (
+        <ol className="terms-list">
+          {copy.items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ol>
+      )}
+
+      {showPaymentMethods && (
+        <section className="terms-payment-section">
+          <PaymentMethodsBox lang={lang} />
+        </section>
+      )}
     </div>
   );
 }

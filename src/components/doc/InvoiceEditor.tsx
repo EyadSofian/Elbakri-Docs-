@@ -438,10 +438,15 @@ export function InvoiceEditor({ initial }: { initial: Invoice }) {
                     <Checkbox
                       id="showPaymentMethods"
                       checked={invoice.showPaymentMethods === true}
-                      onCheckedChange={(c) => patch({ showPaymentMethods: c === true })}
+                      onCheckedChange={(c) =>
+                        patch({
+                          showPaymentMethods: c === true,
+                          termsLang: invoice.termsLang ?? lang,
+                        })
+                      }
                     />
                     <Label htmlFor="showPaymentMethods" className="text-sm">
-                      Show payment methods
+                      Add payment methods page
                     </Label>
                   </div>
                   <div className="flex items-center gap-2 rounded border p-3">
@@ -459,8 +464,8 @@ export function InvoiceEditor({ initial }: { initial: Invoice }) {
                       Add terms page
                     </Label>
                   </div>
-                  {invoice.showTerms && (
-                    <Field label="Terms language">
+                  {(invoice.showTerms || invoice.showPaymentMethods) && (
+                    <Field label="Terms / payment language">
                       <Select
                         value={invoice.termsLang ?? lang}
                         onValueChange={(value) => patch({ termsLang: value as Lang })}
