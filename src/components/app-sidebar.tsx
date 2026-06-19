@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const logoUrl = "/elbakri-logo.png";
+const logoMarkUrl = "/elbakri-logo-mark.png";
 
 const groups = [
   {
@@ -75,17 +76,21 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
-        <div className="flex items-center gap-3 px-2 py-3">
-          <div className="size-10 rounded-md bg-white flex items-center justify-center shrink-0 overflow-hidden">
-            <img src={logoUrl} alt="Elbakri Overseas" className="w-9 h-9 object-contain" />
+        <div className="px-2 py-3">
+          <div className="flex h-14 items-center rounded-lg bg-white px-3 shadow-sm ring-1 ring-white/15 group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-1">
+            <img
+              src={logoUrl}
+              alt="Elbakri Overseas"
+              className="h-10 w-full max-w-[170px] object-contain object-left group-data-[collapsible=icon]:hidden"
+            />
+            <img
+              src={logoMarkUrl}
+              alt="Elbakri Overseas"
+              className="hidden size-8 object-contain group-data-[collapsible=icon]:block"
+            />
           </div>
-          <div className="min-w-0 group-data-[collapsible=icon]:hidden">
-            <div className="text-sidebar-foreground font-semibold leading-tight truncate">
-              Elbakri Overseas
-            </div>
-            <div className="text-[10px] uppercase tracking-[0.18em] text-sidebar-primary">
-              Est. 1982
-            </div>
+          <div className="mt-2 text-[10px] uppercase tracking-[0.16em] text-sidebar-primary group-data-[collapsible=icon]:hidden">
+            Internal Document Studio
           </div>
         </div>
       </SidebarHeader>

@@ -51,7 +51,7 @@ export default function SettingsPage() {
             <img
               src={logoUrl}
               alt="Elbakri"
-              className="h-16 w-16 object-contain bg-white rounded border p-1"
+              className="h-16 w-52 object-contain bg-white rounded border p-2"
             />
             <div>
               <div className="font-semibold doc-navy">{s.name}</div>

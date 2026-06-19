@@ -31,7 +31,7 @@ export function DocHeader({
             src={logoUrl}
             alt="Elbakri Overseas"
             crossOrigin="anonymous"
-            className="h-16 w-16 object-contain"
+            className="h-14 w-48 shrink-0 object-contain object-left"
           />
           <div>
             <div className="text-[18px] font-bold doc-navy tracking-tight leading-none">
