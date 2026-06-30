@@ -207,7 +207,7 @@ function VoucherServiceItemForm({
           </Field>
         </div>
 
-        <ServiceDynamicFields item={item} onChange={patch} onMeta={metaPatch} />
+        <ServiceDynamicFields item={item} onChange={patch} onMeta={metaPatch} voucherOnly />
 
         <Field label="Service notes">
           <Textarea

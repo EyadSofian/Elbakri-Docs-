@@ -16,6 +16,7 @@ type Props = {
   item: ServiceItem;
   onChange: (patch: Partial<ServiceItem>) => void;
   onMeta: (patch: Record<string, any>) => void;
+  voucherOnly?: boolean;
 };
 
 function Field({
@@ -35,7 +36,7 @@ function Field({
   );
 }
 
-export function HotelFields({ item, onMeta }: Props) {
+export function HotelFields({ item, onMeta, voucherOnly = false }: Props) {
   const m = item.meta;
   const nights = nightsBetween(m.checkIn, m.checkOut);
   return (
@@ -87,14 +88,16 @@ export function HotelFields({ item, onMeta }: Props) {
           onChange={(e) => onMeta({ children: Number(e.target.value) })}
         />
       </Field>
-      <Field label="Infant">
-        <Input
-          type="number"
-          min={0}
-          value={m.infant ?? 0}
-          onChange={(e) => onMeta({ infant: Number(e.target.value) })}
-        />
-      </Field>
+      {voucherOnly && (
+        <Field label="Infant">
+          <Input
+            type="number"
+            min={0}
+            value={m.infant ?? 0}
+            onChange={(e) => onMeta({ infant: Number(e.target.value) })}
+          />
+        </Field>
+      )}
       <Field label="Nights">
         <Input value={nights} readOnly className="bg-muted" />
       </Field>
@@ -118,7 +121,16 @@ export function HotelFields({ item, onMeta }: Props) {
             <SelectValue placeholder="Select basis" />
           </SelectTrigger>
           <SelectContent>
-            {RATE_BASIS.map((b) => (
+            {(voucherOnly
+              ? RATE_BASIS
+              : [
+                  { value: "Room Only", en: "Room Only" },
+                  { value: "Bed & Breakfast", en: "Bed & Breakfast" },
+                  { value: "Half Board", en: "Half Board" },
+                  { value: "Full Board", en: "Full Board" },
+                  { value: "All Inclusive", en: "All Inclusive" },
+                ]
+            ).map((b) => (
               <SelectItem key={b.value} value={b.value}>
                 {b.en}
               </SelectItem>
@@ -426,7 +438,7 @@ export function FlightFields({ item, onMeta }: Props) {
   );
 }
 
-export function PackageFields({ item, onMeta }: Props) {
+export function PackageFields({ item, onMeta, voucherOnly = false }: Props) {
   const m = item.meta;
   const nights = nightsBetween(m.departure, m.returnDate);
   return (
@@ -461,18 +473,22 @@ export function PackageFields({ item, onMeta }: Props) {
         <Input value={nights} readOnly className="bg-muted" />
       </Field>
       <Field label="Meal plan">
-        <Select value={m.meal || ""} onValueChange={(v) => onMeta({ meal: v })}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select plan" />
-          </SelectTrigger>
-          <SelectContent>
-            {RATE_BASIS.map((b) => (
-              <SelectItem key={b.value} value={b.value}>
-                {b.en}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {voucherOnly ? (
+          <Select value={m.meal || ""} onValueChange={(v) => onMeta({ meal: v })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select plan" />
+            </SelectTrigger>
+            <SelectContent>
+              {RATE_BASIS.map((b) => (
+                <SelectItem key={b.value} value={b.value}>
+                  {b.en}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <Input value={m.meal || ""} onChange={(e) => onMeta({ meal: e.target.value })} />
+        )}
       </Field>
       <Field label="Hotel" className="col-span-2">
         <Input value={m.hotel || ""} onChange={(e) => onMeta({ hotel: e.target.value })} />
