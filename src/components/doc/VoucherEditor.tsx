@@ -71,6 +71,7 @@ function legacyVoucherService(voucher: Voucher): ServiceItem {
       rooms: voucher.numberOfRooms || 1,
       adults: voucher.adults || 2,
       children: voucher.children || 0,
+      infant: voucher.infant || 0,
       checkIn: voucher.checkIn || "",
       checkOut: voucher.checkOut || "",
       board: voucher.rateBasis || "",
@@ -103,6 +104,7 @@ function primaryServicePatch(item: ServiceItem, current: Voucher): Partial<Vouch
     patch.numberOfRooms = Number(meta.rooms || current.numberOfRooms || 1);
     patch.adults = Number(meta.adults || current.adults || 2);
     patch.children = Number(meta.children || current.children || 0);
+    patch.infant = Number(meta.infant || current.infant || 0);
     patch.checkIn = meta.checkIn || current.checkIn;
     patch.checkOut = meta.checkOut || current.checkOut;
     patch.rateBasis = meta.board || current.rateBasis;
@@ -613,6 +615,14 @@ export function VoucherEditor({ initial }: { initial: Voucher }) {
                     onChange={(e) => setChildrenCount(Number(e.target.value))}
                   />
                 </Field>
+                <Field label="Infant">
+                  <Input
+                    type="number"
+                    min={0}
+                    value={voucher.infant ?? 0}
+                    onChange={(e) => patch({ infant: Number(e.target.value) })}
+                  />
+                </Field>
                 {voucher.children > 0 && (
                   <div className="col-span-2 grid grid-cols-3 gap-2 rounded border border-dashed p-2">
                     {Array.from({ length: voucher.children }).map((_, i) => (
@@ -834,6 +844,7 @@ export function buildBlankVoucher(opts: { number: string }): Voucher {
     roomType: "",
     adults: 2,
     children: 0,
+    infant: 0,
     childrenAges: [],
     checkIn: "",
     checkOut: "",

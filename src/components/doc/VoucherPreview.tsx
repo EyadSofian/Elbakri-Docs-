@@ -43,6 +43,7 @@ function legacyVoucherItems(voucher: Voucher): ServiceItem[] {
         rooms: voucher.numberOfRooms || 1,
         adults: voucher.adults || 2,
         children: voucher.children || 0,
+        infant: voucher.infant || 0,
         checkIn: voucher.checkIn || "",
         checkOut: voucher.checkOut || "",
         board: voucher.rateBasis || "",
@@ -234,6 +235,7 @@ export function VoucherPreview({ voucher, lang = "en" }: { voucher: Voucher; lan
                   <th>{t.rooms}</th>
                   <th>{t.adults}</th>
                   <th>{t.children}</th>
+                  <th>{t.infant}</th>
                 </tr>
               </thead>
               <tbody>
@@ -244,6 +246,7 @@ export function VoucherPreview({ voucher, lang = "en" }: { voucher: Voucher; lan
                   <td>{voucher.numberOfRooms}</td>
                   <td>{voucher.adults}</td>
                   <td>{voucher.children}</td>
+                  <td>{voucher.infant ?? 0}</td>
                 </tr>
               </tbody>
             </table>

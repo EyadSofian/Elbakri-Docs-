@@ -71,6 +71,7 @@ export const T = {
     rooms: "Rooms",
     adults: "Adults",
     children: "Children",
+    infant: "Infant",
     hotelInfoPolicies: "Hotel Information & Policies",
     childrenAges: "Children Ages",
     years: "years",
@@ -250,6 +251,7 @@ export const T = {
     rooms: "الغرف",
     adults: "بالغين",
     children: "أطفال",
+    infant: "رضيع",
     hotelInfoPolicies: "معلومات وسياسات الفندق",
     childrenAges: "أعمار الأطفال",
     years: "سنة",
@@ -371,7 +373,7 @@ export const RATE_BASIS: { value: string; en: string; ar: string }[] = [
   { value: "Half Board", en: "Half Board", ar: "نصف إقامة" },
   { value: "Full Board", en: "Full Board", ar: "إقامة كاملة" },
   { value: "All Inclusive", en: "All Inclusive", ar: "شامل كلياً" },
-  { value: "Soft All Inclusive", en: "Soft All Inclusive", ar: "سوفت أول إنكلوسيف" },
+  { value: "Soft all inclusive", en: "Soft all inclusive", ar: "سوفت أول إنكلوسيف" },
   { value: "Ultra All Inclusive", en: "Ultra All Inclusive", ar: "ألترا أول إنكلوسيف" },
 ];
 

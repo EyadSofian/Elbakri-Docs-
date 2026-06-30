@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import type { ServiceItem } from "@/lib/storage";
 import { nightsBetween } from "@/lib/format";
+import { RATE_BASIS } from "@/lib/i18n";
 
 type Props = {
   item: ServiceItem;
@@ -86,6 +87,14 @@ export function HotelFields({ item, onMeta }: Props) {
           onChange={(e) => onMeta({ children: Number(e.target.value) })}
         />
       </Field>
+      <Field label="Infant">
+        <Input
+          type="number"
+          min={0}
+          value={m.infant ?? 0}
+          onChange={(e) => onMeta({ infant: Number(e.target.value) })}
+        />
+      </Field>
       <Field label="Nights">
         <Input value={nights} readOnly className="bg-muted" />
       </Field>
@@ -109,13 +118,11 @@ export function HotelFields({ item, onMeta }: Props) {
             <SelectValue placeholder="Select basis" />
           </SelectTrigger>
           <SelectContent>
-            {["Room Only", "Bed & Breakfast", "Half Board", "Full Board", "All Inclusive"].map(
-              (b) => (
-                <SelectItem key={b} value={b}>
-                  {b}
-                </SelectItem>
-              ),
-            )}
+            {RATE_BASIS.map((b) => (
+              <SelectItem key={b.value} value={b.value}>
+                {b.en}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </Field>
@@ -454,7 +461,18 @@ export function PackageFields({ item, onMeta }: Props) {
         <Input value={nights} readOnly className="bg-muted" />
       </Field>
       <Field label="Meal plan">
-        <Input value={m.meal || ""} onChange={(e) => onMeta({ meal: e.target.value })} />
+        <Select value={m.meal || ""} onValueChange={(v) => onMeta({ meal: v })}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select plan" />
+          </SelectTrigger>
+          <SelectContent>
+            {RATE_BASIS.map((b) => (
+              <SelectItem key={b.value} value={b.value}>
+                {b.en}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </Field>
       <Field label="Hotel" className="col-span-2">
         <Input value={m.hotel || ""} onChange={(e) => onMeta({ hotel: e.target.value })} />

@@ -293,6 +293,7 @@ export interface Voucher {
   roomType: string;
   adults: number;
   children: number;
+  infant: number;
   childrenAges?: number[];
   checkIn: string;
   checkOut: string;
